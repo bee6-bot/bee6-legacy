@@ -43,7 +43,7 @@ Discord server to the next level.
 ## Installation and Setup
 
 To add BEE6 to your Discord server, simply click on the following
-link: [Invite BEE6](https://beauthebeau.github.io/bee6)
+link: [Invite BEE6](https://beauthebeau.github.io/bee6/invite)
 
 After inviting BEE6, you can set up and customize the bot's features using simple commands. For a full list of commands
 and their usage, type `/help` in your Discord server.
@@ -54,7 +54,7 @@ Have questions or need assistance with BEE6? Join our support
 server: [BEE6 Support Server](https://beauthebeau.github.io/bee6/support)
 
 We value your feedback and suggestions! Feel free to share your thoughts with us in the support server or create an
-issue on our GitHub repository: [BEE6 GitHub Repository](https://github.com/bee6-dev/bee6)
+issue on our GitHub repository: [BEE6 GitHub Repository](https://github.com/beauthebeau/bee6)
 
 ## Contributing
 
