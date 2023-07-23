@@ -18,7 +18,7 @@
   "author": "BeauTheBeau",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^5.3.0",
+    "chalk": "^4.1.2",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "mongoose": "^7.4.0"

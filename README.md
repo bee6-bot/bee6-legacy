@@ -40,6 +40,9 @@ Discord server to the next level.
 - **Fun Mini-games**: If you're looking for some fun and entertainment, enable BEE6's mini games.
   Challenge your community members to trivia, quizzes, and other exciting activities.
 
+- **Economy System**: Create a virtual economy in your server with BEE6's economy system. Members can earn currency by
+  being active and use it to purchase items and play games.
+
 ## Installation and Setup
 
 To add BEE6 to your Discord server, simply click on the following
@@ -59,7 +62,7 @@ issue on our GitHub repository: [BEE6 GitHub Repository](https://github.com/beau
 ## Contributing
 
 Want to contribute to BEE6's development? Check out our contribution guidelines in
-the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+the [CONTRIBUTING.md](CONTRIBUTING.md) file, also check out our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
