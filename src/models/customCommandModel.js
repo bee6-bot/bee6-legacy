@@ -26,4 +26,4 @@ const customCommandSchema = new mongoose.Schema({
     commandChannelRestrictions: { type: Array, required: true }
 });
 
-module.exports = mongoose.model('customCommandModel', customCommandSchema);
+module.exports = mongoose.model('customCommand', customCommandSchema);
