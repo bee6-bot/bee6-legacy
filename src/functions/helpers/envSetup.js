@@ -1,7 +1,9 @@
 require(`dotenv`).config()
 const fs = require(`fs`)
 const readFromConsole = require(`../../functions/helpers/readInput.js`)
-const chalk = require('chalk')
+
+const {logMessage} = require('./logging.js')
+logMessage(`Hello, world! From envSetup.js`, `INFO`)
 
 /**
  * @name envSetup
@@ -15,7 +17,7 @@ async function setupEnv() {
     const fileExists = fs.existsSync(`./.env`)
 
     if (!fileExists) {
-        console.log(`${chalk.yellow(`.env file not found! Creating one.`)}`)
+        logMessage(`.env file not found! Creating one...`, `WARNING`)
         await fs.writeFileSync(`./.env`,
             `TOKEN="" # Get your token from https://discord.com/developers/applications"\n`
             + `CLIENT_ID="" # Get your client ID from https://discord.com/developers/applications"\n`
@@ -23,50 +25,47 @@ async function setupEnv() {
             + `DEBUG=false`
         )
 
-        console.log(`${chalk.green(`.env file created.`)}`)
+        logMessage(`.env file created!`, `INFO`)
     } else {
-        console.log(`${chalk.green(`.env file found!`)}`)
+        logMessage(`.env file found!`, `INFO`)
     }
 
     if (!process.env.TOKEN) {
-        console.log(`${chalk.red(`  No token provided.`)}`)
-        const token = await readFromConsole(`    Please enter your bot's token: `)
+        logMessage(`No token provided.`, `WARNING`)
+        const token = await readFromConsole(`Please enter your bot's token: `)
         fs.writeFileSync(`./.env`, fs.readFileSync(`./.env`).toString().replace(`TOKEN=""`, `TOKEN="${token}"`))
-        console.log(`${chalk.green(`  Token added to .env file.`)}`)
+        logMessage(`Token added to .env file.`, `INFO`)
     }
     else {
-        console.log(`${chalk.green(`  Token found!`)}`)
+        logMessage(`Token found!`, `INFO`)
     }
 
     if (!process.env.CLIENT_ID) {
-        console.log(`${chalk.red(`  No client ID provided.`)}`)
-        const clientId = await readFromConsole(`    Please enter your bot's client ID: `)
+        logMessage(`No client ID provided.`, `WARNING`)
+        const clientId = await readFromConsole(`Please enter your bot's client ID: `)
         fs.writeFileSync(`./.env`, fs.readFileSync(`./.env`).toString().replace(`CLIENT_ID=""`, `CLIENT_ID="${clientId}"`))
-        console.log(`${chalk.green(`  Client ID added to .env file.`)}`)
+        logMessage(`Client ID added to .env file.`, `INFO`)
     } else {
-        console.log(`${chalk.green(`  Client ID found!`)}`)
+        logMessage(`Client ID found!`, `INFO`)
     }
 
     if (!process.env.MONGO_URI) {
-        console.log(`${chalk.red(`  No MongoDB URI provided.`)}`)
-        const mongoURI = await readFromConsole(`    Please enter your MongoDB URI: `)
+        logMessage(`No MongoDB URI provided.`, `WARNING`)
+        const mongoURI = await readFromConsole(`Please enter your MongoDB URI: `)
         fs.writeFileSync(`./.env`, fs.readFileSync(`./.env`).toString().replace(`MONGO_URI=""`, `MONGO_URI="${mongoURI}"`))
-        console.log(`${chalk.green(`  MongoDB URI added to .env file.`)}`)
+        logMessage(`MongoDB URI added to .env file.`, `INFO`)
     } else {
-        console.log(`${chalk.green(`  MongoDB URI found!`)}`)
+        logMessage(`MongoDB URI found!`, `INFO`)
     }
 
     if (!process.env.DEBUG) {
-        console.log(`${chalk.red(`  No debug mode provided.`)}`)
+        logMessage(`Debug mode not found!`, `WARNING`)
         const debug = await readFromConsole(`    Do you want to enable debug mode? (y/n): `)
         fs.writeFileSync(`./.env`, fs.readFileSync(`./.env`).toString().replace(`DEBUG=false`, `DEBUG=${debug === `y` ? `true` : `false`}`))
-        console.log(`${chalk.green(`  Debug mode added to .env file.`)}`)
+        logMessage(`Debug mode added to .env file.`, `INFO`)
     }  else {
-        console.log(`${chalk.green(`  Debug mode found!`)}`)
+        logMessage(`Debug mode found!`, `INFO`)
     }
-    
-    
-
 }
 
 module.exports = setupEnv

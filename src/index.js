@@ -13,7 +13,9 @@ const {Client, GatewayIntentBits, Collection, Events, EmbedBuilder} = require('d
 // 1.3: Misc.
 const process = require(`node:process`)
 const fs = require('fs')
-const chalk = require('chalk')
+const {logMessage} = require('./functions/helpers/logging.js')
+console.log()
+logMessage(`Hello, world! From index.js`, `INFO`)
 
 // 1.4: Database
 const mongoose = require('mongoose')
@@ -59,12 +61,12 @@ client.buttonArray = []
 
 // 2.1: Initialize client
 async function initializeClient() {
-    console.log(`${chalk.yellow(`Initializing client...`)}`);
+    logMessage(`Initializing client...`, `INFO`)
     try {
         await client.login(process.env.TOKEN);
-        console.log(`${chalk.green(`  Logged in as ${client.user.tag}!`)}`);
+        logMessage(`Logged in as ${client.user.tag}!`, `INFO`);
     } catch (err) {
-        console.log(`${chalk.red(`  Error logging in: ${err}`)}`);
+        logMessage(`Error logging in: ${err.stack}`, `ERROR`)
         throw new Error('Client initialization failed.');
     }
 }
@@ -75,7 +77,7 @@ async function initializeClient() {
 
 // 2.2.1: Connect to MongoDB
 async function connectToDatabase() {
-    console.log(`${chalk.yellow(`Connecting to MongoDB...`)}`);
+    logMessage(`Connecting to MongoDB...`, `INFO`)
     const mongoURI = process.env.MONGO_URI;
     mongoose.set(`strictQuery`, true);
 
@@ -84,29 +86,29 @@ async function connectToDatabase() {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-
-        console.log(`${chalk.green(`  Connected to MongoDB!`)}`);
+        logMessage(`Connected to MongoDB!`, `INFO`);
         await initializeClient();
-        console.log(`${chalk.green(`  Client initialized!\n`)}`);
+        logMessage(`Client initialized!`, `INFO`);
+
     } catch (err) {
-        console.log(`${chalk.red(`  Error connecting to MongoDB: ${err}`)}`);
+        logMessage(`Error connecting to MongoDB: ${err.stack}`, `ERROR`)
         throw new Error('Database initialization failed.');
     }
 
     mongoose.connection.on('error', (err) => {
-        console.log(`${chalk.red(`Error with MongoDB: ${err}`)}`);
+        logMessage(`Error connecting to MongoDB: ${err.stack}`, `ERROR`)
     });
 
     mongoose.connection.on('disconnected', () => {
-        console.log(`${chalk.red(`Disconnected from MongoDB.`)}`);
+        logMessage(`Disconnected from MongoDB!`, `INFO`)
     });
 
     mongoose.connection.on('reconnected', () => {
-        console.log(`${chalk.green(`Reconnected to MongoDB!`)}`);
+        logMessage(`Reconnected to MongoDB!`, `INFO`)
     });
 
     mongoose.connection.on('connecting', () => {
-        console.log(`${chalk.yellow(`Connecting to MongoDB...`)}`);
+        logMessage(`Connecting to MongoDB...`, `INFO`)
     });
 }
 
@@ -114,11 +116,31 @@ async function connectToDatabase() {
 // 2.3: Initialize client
 // ===============================================
 
+logMessage(`Readying up...`, `INFO`)
+logMessage(`Debug mode: ${debug}`, `INFO`)
+
 // 2.3.1: Initialize client
 connectToDatabase()
     .then(() => {
-        console.log(`${chalk.green(`  Database initialized!`)}`);
+        logMessage(`Database initialized!`, `INFO`)
     })
     .catch((err) => {
-        console.log(`${chalk.red(`  Error initializing: ${err.message}`)}`);
+        logMessage(`Error initializing database: ${err.stack}`, `ERROR`)
+        process.exit(1)
     });
+
+// ===============================================
+// 3. Error handling
+// ===============================================
+
+// 3.1: Unhandled rejections
+process.on('unhandledRejection', (err) => logMessage(err.stack, 'ERROR'));
+
+// 3.2: Uncaught exceptions
+process.on('uncaughtException', (err) => logMessage(err.stack, 'ERROR'));
+
+// 3.3: Process exit
+process.on('exit', (code) => {
+    logMessage(`Process exited with code ${code}`, 'INFO');
+    mongoose.connection.close();
+});

@@ -18,6 +18,7 @@
   "author": "BeauTheBeau",
   "license": "MIT",
   "dependencies": {
+    "@jsdoc/cli": "^0.3.1",
     "chalk": "^4.1.2",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
