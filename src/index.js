@@ -8,11 +8,10 @@ const envSetup = require('./functions/helpers/envSetup.js');
 envSetup();
 
 // 1.2: Discord.js
-const {Client, GatewayIntentBits, Collection, Events, EmbedBuilder} = require('discord.js')
+const {Client, GatewayIntentBits, Collection } = require('discord.js')
 
 // 1.3: Misc.
 const process = require(`node:process`)
-const fs = require('fs')
 const {logMessage} = require('./functions/helpers/logging.js')
 console.log()
 logMessage(`Hello, world! From index.js`, `INFO`)
@@ -50,21 +49,30 @@ client.commands = new Collection()
 client.buttons = new Collection()
 client.commandArray = []
 client.buttonArray = []
-// require('./functions/handlers/handleCommands.js')(client)
-// require('./functions/handlers/handleButtons.js')(client)
-// require('./functions/handlers/handleEvents.js')(client)
-// require('./functions/handlers/handleSlashCommands.js')(client)
 
 // ===============================================
 // 2. Initialization
 // ===============================================
+
+logMessage(`Readying up...`, `INFO`)
+logMessage(`Debug mode: ${debug}`, `INFO`)
+
+// 2.1: Command and button handlers
+async function initializeHandlers() {
+    logMessage(`Initializing command and button handlers...`, `INFO`)
+    await require('./functions/handlers/handleCommands.js')(client)
+    require('./functions/handlers/handleButtons.js')(client)
+    logMessage(`Command and button handlers initialized!`, `INFO`)
+}
 
 // 2.1: Initialize client
 async function initializeClient() {
     logMessage(`Initializing client...`, `INFO`)
     try {
         await client.login(process.env.TOKEN);
+        logMessage(`Client initialized!`, `INFO`);
         logMessage(`Logged in as ${client.user.tag}!`, `INFO`);
+        await initializeHandlers();
     } catch (err) {
         logMessage(`Error logging in: ${err.stack}`, `ERROR`)
         throw new Error('Client initialization failed.');
@@ -87,8 +95,6 @@ async function connectToDatabase() {
             useUnifiedTopology: true
         });
         logMessage(`Connected to MongoDB!`, `INFO`);
-        await initializeClient();
-        logMessage(`Client initialized!`, `INFO`);
 
     } catch (err) {
         logMessage(`Error connecting to MongoDB: ${err.stack}`, `ERROR`)
@@ -116,13 +122,14 @@ async function connectToDatabase() {
 // 2.3: Initialize client
 // ===============================================
 
-logMessage(`Readying up...`, `INFO`)
-logMessage(`Debug mode: ${debug}`, `INFO`)
-
 // 2.3.1: Initialize client
 connectToDatabase()
     .then(() => {
         logMessage(`Database initialized!`, `INFO`)
+        initializeClient().then(() => {
+            logMessage(`Initialization complete!`, `INFO`)
+            logMessage(`Ready to go!`, `INFO`)
+        })
     })
     .catch((err) => {
         logMessage(`Error initializing database: ${err.stack}`, `ERROR`)

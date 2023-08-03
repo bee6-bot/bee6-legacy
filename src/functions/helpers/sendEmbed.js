@@ -65,7 +65,7 @@ async function sendEmbed(interaction, type, title, description) {
         const embed = new EmbedBuilder()
             .setTitle(title)
             .setDescription(description)
-            .setcolor(colour)
+            .setColor(colour)
             .setTimestamp();
 
         // Reply to the interaction with the embed
@@ -81,4 +81,4 @@ async function sendEmbed(interaction, type, title, description) {
     }
 }
 
-module.exports = {sendEmbed};
+module.exports = {sendEmbed, EmbedType};
