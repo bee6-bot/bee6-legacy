@@ -61,7 +61,7 @@ module.exports = async (client) => {
             logMessage(`Running command ${command.name}`, `INFO`);
             await command.execute(interaction, client);
         } catch (error) {
-            logMessage(`Error running command ${command.name}: ${error}`, `ERROR`);
+            logMessage(`Error running command ${command.name}: ${error.stack}`, `ERROR`);
             await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
         }
 

@@ -43,7 +43,7 @@ const EmbedType = {
 
 const {EmbedBuilder} = require("discord.js");
 
-async function sendEmbed(interaction, type, title, description) {
+async function sendEmbed(interaction, type, title, description, ephemeral = true, components = []) {
     try {
         let colour;
 
@@ -68,15 +68,23 @@ async function sendEmbed(interaction, type, title, description) {
             .setColor(colour)
             .setTimestamp();
 
+        // Check if components is an array
+        if (components && !Array.isArray(components)) {
+            throw new Error('Components must be an array.');
+        }
+
         // Reply to the interaction with the embed
         try {
-            await interaction.reply({embeds: [embed]});
+            await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
         } catch (err) {
             if (err.code === 10062) await interaction.editReply({embeds: [embed]});
-            else throw err;
+            else {
+                logMessage(`Error sending embed: ${err.stack}`, 'ERROR');
+                throw err;
+            }
         }
     } catch (error) {
-        logMessage(`Error sending embed: ${error}`, 'ERROR');
+        logMessage(`Error sending embed: ${error.stack}`, 'ERROR');
         throw error;
     }
 }
