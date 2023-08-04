@@ -36,7 +36,7 @@ async function addMoney(userID, guildID, amount) {
     if (!user) throw new Error(`User does not exist.`);
 
     // Add the money
-    user.cash += amount.toFixed(2);
+    user.cash += parseFloat(amount.toFixed(2));
     await user.save();
 }
 
@@ -61,7 +61,7 @@ async function removeMoney(userID, guildID, amount) {
     if (!user) throw new Error(`User does not exist.`);
 
     // Remove the money
-    user.cash -= amount.toFixed(2);
+    user.cash -= parseFloat(amount.toFixed(2));
     await user.save();
 }
 

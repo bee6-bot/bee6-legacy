@@ -52,7 +52,7 @@ module.exports = {
             const randomIndex = Math.floor(Math.random() * jobs.length);
             const [title, message, minPay, maxPay] = jobs[randomIndex];
             const randomPay = formatMoney(parseFloat(randomAmount(minPay, maxPay)));
-            const newMessage = message.replace("<money>", randomPay);
+            const newMessage = message.replace("<money>", `:pound: ${randomPay}`);
             return [title, newMessage];
         }
 
