@@ -10,24 +10,30 @@ const userSchema = new mongoose.Schema({
     muted: {type: Boolean, default: false},
     mutedData: {type: Object, default: {}},
 
+    // Bot
+    isBotDeveloper: {type: Boolean, default: false},
+    isBotContributor: {type: Boolean, default: false},
+    isBotDonater: {type: Boolean, default: false},
+
     // Leveling
     xp: {type: Number, default: 0},
     level: {type: Number, default: 0},
 
     // Economy
-    cash: {type: BigInt, default: 0},
-    bank: {type: BigInt, default: 0},
+    cash: {type: Number, default: 0},
+    bank: {type: Number, default: 5000.00},
+    inventory: {type: Array, default: []},
 
     // Stats
     messages: {type: Number, default: 0},
     commands: {type: Number, default: 0},
     polls: {type: Number, default: 0},
-    moneyEarned: {type: BigInt, default: 0},
-    moneySpent: {type: BigInt, default: 0},
-    moneyGambled: {type: BigInt, default: 0},
-    moneyRobbed: {type: BigInt, default: 0}, // How much money the user has robbed from others
-    moneyRobbedFrom: {type: BigInt, default: 0}, // How much money the user has been robbed for
-    moneyGiven: {type: BigInt, default: 0},
+    moneyEarned: {type: Number, default: 0},
+    moneySpent: {type: Number, default: 0},
+    moneyGambled: {type: Number, default: 0},
+    moneyRobbed: {type: Number, default: 0}, // How much money the user has robbed from others
+    moneyRobbedFrom: {type: Number, default: 0}, // How much money the user has been robbed for
+    moneyGiven: {type: Number, default: 0},
 
     // Moderation
     isModerator: {type: Boolean, default: false},
@@ -40,7 +46,7 @@ const userSchema = new mongoose.Schema({
     infractions: {type: Array, default: 0},
 
     // Fun
-    favoriteColour: {type: String, default: '#ffffff'},
+    favoriteColour: {type: String, default: 'None'},
     favoriteAnimal: {type: String, default: 'None'},
     favoriteFood: {type: String, default: 'None'},
     favoriteGame: {type: String, default: 'None'},

@@ -4,7 +4,7 @@ const guildSchema = new mongoose.Schema({
 
     // General
     guildID: {type: String, required: true, index: true},
-    language: {type: String, default: 'en'},
+    language: {type: String, default: 'en'}, // Unused
     disabledCommands: {type: Array, default: []},
 
     // Moderation
