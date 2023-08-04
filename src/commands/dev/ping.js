@@ -1,5 +1,5 @@
 const {SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require('discord.js');
-const {sendEmbed, EmbedType} = require('../functions/helpers/sendEmbed');
+const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
 
 module.exports = {
     data: new SlashCommandBuilder()
