@@ -71,18 +71,21 @@ async function removeMoney(userID, guildID, amount) {
  * @param {string} userID User ID
  * @param {string} guildID Guild ID
  * @param {number} amount Amount to set
+ * @param {boolean} bank Whether to set the bank or cash
  * @returns {Promise<void>}
  * @throws {Error} If an error occurs while setting money
  * @throws {Error} If the user does not exist
  */
 
-async function setMoney(userID, guildID, amount) {
+async function setMoney(userID, guildID, amount, bank = false) {
     // Get the user
     const user = await userModel.findOne({ userID, guildID });
     if (!user) throw new Error(`User does not exist.`);
 
     // Set the money
-    user.cash = amount.toFixed(2);
+    if (bank) user.bank = parseFloat(amount.toFixed(2));
+    else user.cash = parseFloat(amount.toFixed(2));
+
     await user.save();
 }
 

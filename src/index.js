@@ -59,10 +59,13 @@ logMessage(`Debug mode: ${debug}`, `INFO`)
 
 // 2.1: Command and button handlers
 async function initializeHandlers() {
-    logMessage(`Initializing command and button handlers...`, `INFO`)
+    logMessage(`Initializing command handlers...`, `INFO`)
     await require('./functions/handlers/handleCommands.js')(client)
-    require('./functions/handlers/handleButtons.js')(client)
-    logMessage(`Command and button handlers initialized!`, `INFO`)
+    // require('./functions/handlers/handleButtons.js')(client)
+    logMessage(`Command handlers initialized!`, `INFO`)
+
+    await require('./functions/handlers/handleEvents.js')(client)
+
 }
 
 // 2.1: Initialize client

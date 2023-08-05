@@ -53,6 +53,18 @@ const userSchema = new mongoose.Schema({
     favoriteMovie: {type: String, default: 'None'},
     favoriteShow: {type: String, default: 'None'},
 
+    // Preferences
+    preferences: {
+        // General
+        compactMode: {type: Boolean, default: false}, // Whether to use compact mode or not (typically uses plain messages instead of embeds, not yet implemented)
+        moderationDMs: {type: Boolean, default: true}, // Get DMs when you are warned, kicked, banned, etc.
+
+        // Leveling
+        levelUpMessages: {type: Boolean, default: true},
+        levelUpDMs: {type: Boolean, default: false}, // Send level up message in DMs
+
+    },
+
     // Social Media
     socialNotifications: {
         twitterNotifications: {type: Boolean, default: false},

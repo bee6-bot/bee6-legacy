@@ -37,52 +37,71 @@ const EmbedType = {
  * @param {("WARNING"|"ERROR"|"INFO"|"SUCCESS")} type - The type of the embed.
  * @param {string} title - The title of the embed.
  * @param {string} description - The main content of the embed.
+ * @param {boolean} [ephemeral=true] - Whether the embed should be ephemeral (only visible to the user who triggered the interaction).
+ * @param {Array} [components=[]] - The components to add to the embed.
+ * @param {boolean} [edit=false] - Whether to edit the original reply instead of sending a new one.
  * @returns {Promise<void>}
  * @throws {Error} If an error occurs while sending the embed.
  */
 
 const {EmbedBuilder} = require("discord.js");
 
-async function sendEmbed(interaction, type, title, description, ephemeral = true, components = []) {
+async function sendEmbed(interaction, type, title, description, ephemeral = true, components = [], edit = false, compact = false) {
     try {
-        let colour;
+        let colour, emoji;
 
         // Determine the colour based on the type
         switch (type) {
             case 'WARNING':
                 colour = '#FFA500';
+                emoji = '⚠️';
                 break;
             case 'ERROR':
                 colour = '#FF0000';
+                emoji = '❌';
                 break;
             case 'SUCCESS':
                 colour = '#00FF00';
+                emoji = '✅';
                 break;
             case 'INFO':
                 colour = '#7289DA';
+                emoji = 'ℹ️';
         }
 
-        const embed = new EmbedBuilder()
-            .setTitle(title)
-            .setDescription(description)
-            .setColor(colour)
-            .setTimestamp();
+        if (!compact) {
+            const embed = new EmbedBuilder()
+                .setTitle(title)
+                .setDescription(description)
+                .setColor(colour)
+                .setTimestamp();
 
-        // Check if components is an array
-        if (components && !Array.isArray(components)) {
-            throw new Error('Components must be an array.');
-        }
+            // Check if components is an array
+            if (components && !Array.isArray(components)) {
+                throw new Error('Components must be an array.');
+            }
 
-        // Reply to the interaction with the embed
-        try {
-            await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
-        } catch (err) {
-            if (err.code === 10062) await interaction.editReply({embeds: [embed]});
-            else {
-                logMessage(`Error sending embed: ${err.stack}`, 'ERROR');
-                throw err;
+            // Reply to the interaction with the embed
+            try {
+                if (edit) await interaction.editReply({embeds: [embed], ephemeral: ephemeral, components: components});
+                else await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
+            } catch (err) {
+                if (err.code === 10062) await interaction.editReply({embeds: [embed]});
+                else {
+                    logMessage(`Error sending embed: ${err.stack}`, 'ERROR');
+                    throw err;
+                }
             }
         }
+
+        else {
+            await interaction.reply({
+                content: `**${emoji} ${title}**\n${description}`,
+                ephemeral: ephemeral,
+                components: components
+            });
+        }
+
     } catch (error) {
         logMessage(`Error sending embed: ${error.stack}`, 'ERROR');
         throw error;
