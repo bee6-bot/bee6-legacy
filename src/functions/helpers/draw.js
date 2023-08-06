@@ -26,7 +26,4 @@ function drawProgressBar(percent, length, fillChar = `🟦`, emptyChar = `⬛`) 
 
 }
 
-console.log(drawProgressBar(78, 20)); // =====----
-
-
 module.exports = { drawProgressBar };
