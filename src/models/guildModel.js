@@ -18,6 +18,15 @@ const guildSchema = new mongoose.Schema({
         events: {type: Array, default: []}
     },
 
+    // XP
+    xp: {type: Boolean, default: true},
+    xpIgnore: {
+        channels: {type: Array, default: []},
+        roles: {type: Array, default: []},
+        users: {type: Array, default: []}
+    },
+    xpCooldown: {type: Number, default: 60}, // Intended for dynamic XP cooldown (based on guild activity)
+
     // Welcome
     welcome: {type: Boolean, default: false},
     welcomeChannelID: {type: String, default: ''},
