@@ -3,7 +3,7 @@ const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('ping')
+        .setName('bot-stats')
         .setDescription('Replies with bot latency and other stats.'),
     async execute(interaction) {
 
