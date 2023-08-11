@@ -14,10 +14,10 @@ module.exports = {
 
     async execute(interaction) {
         const user = interaction.options.getUser('user') || interaction.user;
-        const {level, xp, xpNeeded} = await getLevelData(user.id, interaction.guild.id);
+        const {level, xp, xpNeeded, xpTotal} = await getLevelData(user.id, interaction.guild.id);
 
-        const percentage = Math.round((xp / xpNeeded) * 100);
+        const percentage = Math.floor((xp / xpNeeded) * 100);
         const progressBar = drawProgressBar(percentage, 20);
-        await sendEmbed(interaction, EmbedType.INFO, `Level`, `Level: ${level.toFixed(0)}\nXP: ${xp.toFixed(0)} / ${xpNeeded.toFixed(0)}\n${progressBar}`);
+        await sendEmbed(interaction, EmbedType.INFO, `Level`, `Level: ${level.toFixed(0)}\nXP: ${xp.toFixed(0)} / ${xpTotal.toFixed(0)}\n${progressBar}`);
     }
 }

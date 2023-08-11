@@ -126,7 +126,7 @@ async function getLevelData(userID, guildID) {
     let user;
     try {
         user = await userModel.findOne({userID, guildID});
-        return {level: user.level, xp: user.xp, xpNeeded: calculateXPUntilNextLevel(user.level, user.xp)};
+        return {level: user.level, xp: user.xp, xpNeeded: calculateXPUntilNextLevel(user.level, user.xp), xpTotal: calculateXPUntilLevel(user.level) + user.xp};
     } catch (err) {
         throw new Error(`Error while getting user: ${err}`);
     }

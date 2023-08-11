@@ -63,37 +63,51 @@ module.exports = async (client) => {
         const userModel = require(`../../models/userModel`);
         const guildModel = require(`../../models/guildModel`);
 
-        const guild = await guildModel.findOne({guildId: interaction.guild.id});
-        if (!guild) {
+        async function createUser() {
+            logMessage(`User ${interaction.user.id} not found in database.`, `WARNING`);
+            try {
+                const newUser = await new userModel({
+                    userID: interaction.user.id,
+                    guildID: interaction.guild.id
+                });
+                await newUser.save();
+            } catch (error) {
+                logMessage(`Error creating user ${interaction.user.id}: ${error.stack}`, `ERROR`);
+                await interaction.reply({
+                    content: 'Whoops! Something went wrong. The user could not be created.',
+                    ephemeral: true
+                });
+            }
+
+        }
+
+        async function createGuild() {
             logMessage(`Guild ${interaction.guild.id} not found in database.`, `WARNING`);
             try {
-                await new guildModel({
+                const newGuild = await new guildModel({
                     guildID: interaction.guild.id,
                     welcomeChannel: interaction.guild.systemChannelId,
                     welcomeMessage: `Welcome to the server, {{user}}!`,
                     leaveChannel: interaction.guild.systemChannelId,
                     leaveMessage: `{{user}} has left the server.`
-                }).save();
+                });
+                await newGuild.save();
             } catch (error) {
                 logMessage(`Error creating guild ${interaction.guild.id}: ${error.stack}`, `ERROR`);
-                await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
+                await interaction.reply({
+                    content: 'Whoops! Something went wrong. The guild could not be created.',
+                    ephemeral: true
+                });
             }
         }
 
+        // Check if the guild is in the database
+        const guild = await guildModel.findOne({guildID: interaction.guild.id});
+        if (guild === null) await createGuild();
+
         // Check if the user is in the database
-        const user = await userModel.findOne({userId: interaction.user.id, guildId: interaction.guild.id});
-        if (!user) {
-            logMessage(`User ${interaction.user.id} not found in database.`, `WARNING`);
-            try {
-                await new userModel({
-                    userID: interaction.user.id,
-                    guildID: interaction.guild.id
-                }).save();
-            } catch (error) {
-                logMessage(`Error creating user ${interaction.user.id}: ${error.stack}`, `ERROR`);
-                await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
-            }
-        }
+        const user = await userModel.findOne({userID: interaction.user.id, guildID: interaction.guild.id});
+        if (user === null) await createUser();
 
         if (!interaction.isCommand()) return;
         const command = client.commands.get(interaction.commandName);

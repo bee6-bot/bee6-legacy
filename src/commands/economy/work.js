@@ -59,7 +59,6 @@ module.exports = {
         const jobMessage = await pickRandomJobMessage();
         const jobTitle = jobMessage[0], jobDescription = jobMessage[1];
         await addMoney(interaction.user.id, interaction.guild.id, randomAmount(100, 500));
-
-        await sendEmbed(interaction, EmbedType.SUCCESS, jobTitle, jobDescription);
+        await sendEmbed(interaction, EmbedType.SUCCESS, jobTitle, jobDescription, false);
     }
 }

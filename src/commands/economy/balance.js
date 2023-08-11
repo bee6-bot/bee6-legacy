@@ -15,7 +15,7 @@ module.exports = {
             EmbedType.INFO,
             `Balance`,
             `**:pound: Cash:** ${formatMoney(cash)}\n**:bank: Bank:** ${formatMoney(bank)}`,
-            true
+            false
         );
     }
 }

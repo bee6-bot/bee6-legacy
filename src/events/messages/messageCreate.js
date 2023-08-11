@@ -4,6 +4,7 @@ logMessage(`Hello, world! From messageCreate.js`, `INFO`);
 const {addXP} = require('../../functions/helpers/leveling');
 const {addMoney} = require('../../functions/helpers/money');
 const {Snowflake} = require('discord.js');
+const { checkUser } = require('../../functions/helpers/makerSurerExister');
 
 const calldowns = { 'xp': { /* userID, guildID, timestamp */ }}
 
@@ -24,6 +25,8 @@ module.exports = {
          */
 
         async function awardXP(userID, guildID, message) {
+
+            await checkUser(userID, guildID);
 
             if (calldowns.xp[userID] && calldowns.xp[userID][guildID]) {
                 if (calldowns.xp[userID][guildID] > Date.now()) return;
