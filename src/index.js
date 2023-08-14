@@ -5,10 +5,9 @@
 // 1.1: Config files and environment variables
 require('dotenv').config()
 const envSetup = require('./functions/helpers/envSetup.js');
-envSetup();
 
 // 1.2: Discord.js
-const {Client, GatewayIntentBits, Collection } = require('discord.js')
+const {Client, GatewayIntentBits, Collection} = require('discord.js')
 
 // 1.3: Misc.
 const process = require(`node:process`)
@@ -36,8 +35,8 @@ const Models = {
 // const {getMemberData} = require('./functions/helpers/memberData.js')
 
 // 1.6: Debugging
-const debug = process.env.DEBUG === 'true'
-const debugGuild = process.env.DEBUG_GUILD
+let debug = process.env.DEBUG === 'true'
+let debugGuild = process.env.DEBUG_GUILD
 
 // 1.7: Client
 const client = new Client({
@@ -126,18 +125,20 @@ async function connectToDatabase() {
 // ===============================================
 
 // 2.3.1: Initialize client
-connectToDatabase()
-    .then(() => {
-        logMessage(`Database initialized!`, `INFO`)
-        initializeClient().then(() => {
-            logMessage(`Initialization complete!`, `INFO`)
-            logMessage(`Ready to go!`, `INFO`)
+envSetup().then(() => {
+    connectToDatabase()
+        .then(() => {
+            logMessage(`Database initialized!`, `INFO`)
+            initializeClient().then(() => {
+                logMessage(`Initialization complete!`, `INFO`)
+                logMessage(`Ready to go!`, `INFO`)
+            })
         })
-    })
-    .catch((err) => {
-        logMessage(`Error initializing database: ${err.stack}`, `ERROR`)
-        process.exit(1)
-    });
+        .catch((err) => {
+            logMessage(`Error initializing database: ${err.stack}`, `ERROR`)
+            process.exit(1)
+        });
+})
 
 // ===============================================
 // 3. Error handling
