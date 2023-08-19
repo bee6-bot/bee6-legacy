@@ -1,4 +1,4 @@
-# BEE6—Your All-in-One Discord Bot
+# BEE6
 
 Welcome to BEE6, the versatile and feature-packed Discord bot designed to cater to all your server's needs. As a free
 and open-source alternative to MEE6 and other popular bots, BEE6 offers a wide range of functionalities to elevate your

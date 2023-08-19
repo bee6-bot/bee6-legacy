@@ -87,6 +87,7 @@ async function sendEmbed(interaction, type, title, description, ephemeral = true
                 else await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
             } catch (err) {
                 if (err.code === 10062) await interaction.editReply({embeds: [embed]});
+                if (err.code === "InteractionAlreadyReplied") await interaction.editReply({embeds: [embed]});
                 else {
                     logMessage(`Error sending embed: ${err.stack}`, 'ERROR');
                     throw err;

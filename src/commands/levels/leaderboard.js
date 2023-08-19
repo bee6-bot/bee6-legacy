@@ -12,7 +12,7 @@ module.exports = {
         .setDescription('Get the leaderboard.'),
     async execute(interaction) {
 
-        const leaderboard = await getLeaderboard(interaction.guild.id, 1);
+        const leaderboard = await getLeaderboard(interaction.guild.id, 10);
         let leaderboardString = ``;
 
         for (let i = 0; i < leaderboard.length; i++) {

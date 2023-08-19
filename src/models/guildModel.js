@@ -20,12 +20,15 @@ const guildSchema = new mongoose.Schema({
 
     // XP
     xp: {type: Boolean, default: true},
+    lastMee6Sync: {type: Number, default: 0},
+    mee6Syncing: {type: Boolean, default: false},
     xpIgnore: {
         channels: {type: Array, default: []},
         roles: {type: Array, default: []},
         users: {type: Array, default: []}
     },
-    xpCooldown: {type: Number, default: 60}, // Intended for dynamic XP cooldown (based on guild activity)
+    xpCooldown: {type: Number, default: 60}, // Intended for dynamic XP cooldown (based on guild activity), yet to be implemented
+
 
     // Welcome
     welcome: {type: Boolean, default: false},

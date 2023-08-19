@@ -16,8 +16,10 @@ const userSchema = new mongoose.Schema({
     isBotDonater: {type: Boolean, default: false},
 
     // Leveling
-    xp: {type: Number, default: 0},
     level: {type: Number, default: 0},
+    totalXP: {type: Number, default: 0}, // Total XP ever earned
+    xp: {type: Number, default: 0}, // Total XP at current level
+    xpNeeded: {type: Number, default: 110}, // XP needed to level up
 
     // Economy
     cash: {type: Number, default: 0},
@@ -62,7 +64,6 @@ const userSchema = new mongoose.Schema({
         // Leveling
         levelUpMessages: {type: Boolean, default: true},
         levelUpDMs: {type: Boolean, default: false}, // Send level up message in DMs
-
     },
 
     // Social Media

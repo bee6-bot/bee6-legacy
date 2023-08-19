@@ -34,9 +34,10 @@ const maxBonusFactor = 1;
  */
 
 function calculateXPUntilNextLevel(level, xp) {
+    // FORMULA 5 * (lvl ^ 2) + (50 * lvl) + 100 - xp
     if (level < 0) throw new Error(`Level must be positive.`);
     if (xp < 0) throw new Error(`XP must be positive.`);
-    return 5 * (level ^ 2) + (50 * level) + 100 - xp;
+    return 5 * (level ** 2) + (50 * level) + 100 - xp;
 }
 
 /**
@@ -50,12 +51,6 @@ function calculateXPUntilNextLevel(level, xp) {
 function calculateXPUntilLevel(level) {
     if (level < 0) throw new Error(`Level must be positive.`);
     return 5 * (level ^ 2) + (50 * level) + 100;
-}
-
-function calculateXPUntilNextLevel(level, xp) {
-    if (level < 0) throw new Error(`Level must be positive.`);
-    if (xp < 0) throw new Error(`XP must be positive.`);
-    return 5 * (level ^ 2) + (50 * level) + 100 - xp;
 }
 
 /**
@@ -100,12 +95,13 @@ async function addXP(userID, guildID, length, message) {
     const xpGain = baseXPRandom + (baseXPRandom * lengthBonusFactor);
 
     user.xp += xpGain;
+    user.totalXP += xpGain;
+    user.xpNeeded = calculateXPUntilNextLevel(user.level, user.xp);
     const xpNeeded = calculateXPUntilNextLevel(user.level, user.xp);
 
     if (xpNeeded <= 0) {
         user.xp = -xpNeeded;
         user.level += 1;
-
         await sendLevelUpMessage(user, message);
     }
 
@@ -126,7 +122,12 @@ async function getLevelData(userID, guildID) {
     let user;
     try {
         user = await userModel.findOne({userID, guildID});
-        return {level: user.level, xp: user.xp, xpNeeded: calculateXPUntilNextLevel(user.level, user.xp), xpTotal: calculateXPUntilLevel(user.level) + user.xp};
+        return {
+            level: user.level,
+            xp: user.xp,
+            xpNeeded: calculateXPUntilNextLevel(user.level, user.xp),
+            xpTotal: calculateXPUntilLevel(user.level) + user.xp
+        };
     } catch (err) {
         throw new Error(`Error while getting user: ${err}`);
     }
@@ -138,7 +139,10 @@ async function getLevelData(userID, guildID) {
  */
 
 async function getLeaderboard(guildID, limit = 10, page, ascending = false) {
-    const users = await userModel.find({guildID}).sort({totalXP: ascending ? 1 : -1}).limit(limit).skip((page - 1) * limit);
+    const users = await userModel.find({guildID}).sort({
+        level: ascending ? 1 : -1,
+        xp: ascending ? 1 : -1
+    }).limit(limit).skip((page - 1) * limit);
     return users.map((user, position) => {
         return {
             position: position + 1,
@@ -149,7 +153,6 @@ async function getLeaderboard(guildID, limit = 10, page, ascending = false) {
         };
     });
 }
-
 
 
 module.exports = {addXP, getLevelData, getLeaderboard, calculateXPUntilNextLevel, calculateXPUntilLevel};
