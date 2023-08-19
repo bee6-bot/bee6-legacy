@@ -68,7 +68,7 @@ async function removeMoney(userID, guildID, amount) {
 /**
  * @name setMoney
  * @description Set a user's balance
- * @param {string} userID User ID
+ * @param {} userID User ID
  * @param {string} guildID Guild ID
  * @param {number} amount Amount to set
  * @param {boolean} bank Whether to set the bank or cash
