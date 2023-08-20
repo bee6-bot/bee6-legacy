@@ -77,9 +77,8 @@ async function sendEmbed(interaction, type, title, description, ephemeral = true
                 .setTimestamp();
 
             // Check if components is an array
-            if (components && !Array.isArray(components)) {
-                throw new Error('Components must be an array.');
-            }
+            if (components && !Array.isArray(components)) throw new Error('Components must be an array.');
+
 
             // Reply to the interaction with the embed
             try {

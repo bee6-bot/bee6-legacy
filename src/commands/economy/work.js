@@ -1,7 +1,7 @@
 const {addMoney, formatMoney} = require('../../functions/helpers/money')
 const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed')
 const {SlashCommandBuilder} = require('discord.js');
-
+const { getCooldown, setCooldown } = require('../../functions/helpers/cooldownManager');
 
 module.exports = {
 
@@ -42,6 +42,10 @@ module.exports = {
             ["🍦 Ice Cream Connoisseur", "Great job taste testing ice creams! You earned <money>.", 120, 250],
             ["🎤 Karaoke Star", "You worked as a karaoke host and earned <money>!", 180, 350],
         ];
+
+        const cooldown = await getCooldown(interaction.user.id, interaction.guild.id, 'work');
+        if (cooldown !== false) return await sendEmbed(interaction, EmbedType.ERROR, 'Work', `You can work again <t:${Math.floor(cooldown / 1000)}:R>`, false);
+        if (await setCooldown(interaction.user.id, interaction.guild.id, 'work') === false) return await sendEmbed(interaction, EmbedType.ERROR, 'Work', 'An error occurred while setting your cooldown.', false);
 
         const randomAmount = (min, max) => {
             const randomNum = Math.random() * (max - min) + min;

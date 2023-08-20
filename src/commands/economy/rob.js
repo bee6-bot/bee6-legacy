@@ -1,6 +1,7 @@
 const {formatMoney, setMoney, getMoney} = require('../../functions/helpers/money');
 const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed')
 const {SlashCommandBuilder} = require('discord.js');
+const { getCooldown, setCooldown } = require('../../functions/helpers/cooldownManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,6 +9,10 @@ module.exports = {
         .setDescription('Rob a user')
         .addUserOption(option => option.setName('user').setDescription('User to rob').setRequired(true)),
     async execute(interaction) {
+
+        const cooldown = await getCooldown(interaction.user.id, interaction.guild.id, 'rob');
+        if (cooldown !== false) return await sendEmbed(interaction, EmbedType.ERROR, 'Rob', `You can rob again <t:${Math.floor(cooldown / 1000)}:R>`, false);
+        if (await setCooldown(interaction.user.id, interaction.guild.id, 'rob') === false) return await sendEmbed(interaction, EmbedType.ERROR, 'Rob', 'An error occurred while setting your cooldown.', false);
 
         await interaction.deferReply()
         const {cash} = await getMoney(interaction.user.id, interaction.guild.id);

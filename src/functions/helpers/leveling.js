@@ -9,6 +9,7 @@
 // ===============================================
 
 const {logMessage} = require('../../functions/helpers/logging');
+const {Snowflake} = require('discord.js');
 logMessage(`Hello, world! From leveling.js`, `INFO`);
 const userModel = require('../../models/userModel');
 
@@ -71,7 +72,7 @@ async function sendLevelUpMessage(userData, message) {
 /**
  * @name addXP
  * @description Add XP to a user's balance
- * @param {} userID User ID
+ * @param {Snowflake} userID User ID
  * @param {string} guildID Guild ID
  * @param {number} length Length of the message (capped at 100)
  * @param message
