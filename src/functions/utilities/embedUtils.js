@@ -1,4 +1,6 @@
 const {logMessage} = require('./loggingUtils');
+const userModel = require('../../models/userModel');
+
 /**
  * @name sendEmbed
  * @type module
@@ -46,7 +48,12 @@ const EmbedType = {
 
 const {EmbedBuilder} = require("discord.js");
 
-async function embedUtils(interaction, type, title, description, ephemeral = true, components = [], edit = false, compact = false) {
+async function embedUtils(interaction, type, title, description, ephemeral = true, components = [], edit = false) {
+
+    // Get user configs
+    const user = await userModel.findOne({userID: interaction.user.id, guildID: interaction.guild.id});
+    let compact = user.preferences.compactMode || false;
+
     try {
         let colour, emoji;
 
@@ -78,7 +85,6 @@ async function embedUtils(interaction, type, title, description, ephemeral = tru
 
             // Check if components is an array
             if (components && !Array.isArray(components)) throw new Error('Components must be an array.');
-
 
             // Reply to the interaction with the embed
             try {

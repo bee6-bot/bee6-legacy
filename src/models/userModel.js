@@ -48,12 +48,12 @@ const userSchema = new mongoose.Schema({
     infractions: {type: Array, default: 0},
 
     // Fun
-    favoriteColour: {type: String, default: 'None'},
-    favoriteAnimal: {type: String, default: 'None'},
-    favoriteFood: {type: String, default: 'None'},
-    favoriteGame: {type: String, default: 'None'},
-    favoriteMovie: {type: String, default: 'None'},
-    favoriteShow: {type: String, default: 'None'},
+    favouriteColour: {type: String, default: 'None'},
+    favouriteAnimal: {type: String, default: 'None'},
+    favouriteFood: {type: String, default: 'None'},
+    favouriteGame: {type: String, default: 'None'},
+    favouriteMovie: {type: String, default: 'None'},
+    favouriteShow: {type: String, default: 'None'},
 
     // Preferences
     preferences: {

@@ -42,12 +42,10 @@ module.exports = async (client) => {
 
     for (const dir of commandDirs) {
         const commands = readdirSync(join(__dirname, '../../commands', dir)).filter(file => file.endsWith('.js'));
-        logMessage(`Loading ${commands.length} commands from ${dir}`, `INFO`);
         for (const file of commands) {
             const command = require(`../../commands/${dir}/${file}`);
             await client.commands.set(command.data.name, command);
             client.commandArray.push(command.data.toJSON());
-            logMessage(`Loaded command ${command.data.name}`, `INFO`);
         }
     }
 
