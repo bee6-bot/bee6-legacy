@@ -1,10 +1,10 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {logMessage} = require('../../functions/helpers/logging');
+const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From syncLevels.js`, `INFO`);
 const UserModel = require('../../models/userModel');
 const guildModel = require('../../models/guildModel');
-const {calculateXPUntilNextLevel} = require('../../functions/helpers/leveling');
-const {drawProgressBar} = require("../../functions/helpers/draw");
+const {calculateXPUntilNextLevel} = require('../../functions/utilities/levelUtils');
+const {drawProgressBar} = require("../../functions/utilities/draw");
 
 const apiUrl = "https://mee6.xyz/api/plugins/levels/leaderboard/"
 let batchSize = 10; // Number of players to process in a single batch

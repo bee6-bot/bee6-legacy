@@ -1,5 +1,5 @@
-const {getMoney, formatMoney} = require('../../functions/helpers/money');
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
+const {getMoney, formatMoney} = require('../../functions/utilities/moneyUtils');
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
 const {SlashCommandBuilder} = require('discord.js');
 
 module.exports = {

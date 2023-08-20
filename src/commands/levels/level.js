@@ -1,10 +1,10 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {logMessage} = require('../../functions/helpers/logging');
+const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From level.js`, `INFO`);
 
-const {getLevelData} = require('../../functions/helpers/leveling');
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
-const {drawProgressBar} = require('../../functions/helpers/draw');
+const {getLevelData} = require('../../functions/utilities/levelUtils');
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
+const {drawProgressBar} = require('../../functions/utilities/draw');
 
 module.exports = {
     data: new SlashCommandBuilder()

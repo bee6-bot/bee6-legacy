@@ -22,7 +22,7 @@ const guildSchema = new mongoose.Schema({
 
     // Cooldowns
     workCooldown: {type: Number, default: 180000}, // 3 minutes
-    robCooldown: {type: Number, default: 300000}, // 5 minute
+    TrobCooldown: {type: Number, default: 300000}, // 5 minute
     gambleCooldown: {type: Number, default: 300000}, // 5 minutes
 
     // XP

@@ -1,5 +1,5 @@
 require('dotenv').config();
-const {logMessage} = require('../helpers/logging');
+const {logMessage} = require('../utilities/loggingUtils');
 logMessage(`Hello, world! From handleCommands.js`, `INFO`);
 
 const {REST, Routes} = require('discord.js');

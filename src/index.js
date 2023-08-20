@@ -4,14 +4,14 @@
 
 // 1.1: Config files and environment variables
 require('dotenv').config()
-const envSetup = require('./functions/helpers/envSetup.js');
+const envSetup = require('./functions/utilities/envSetup.js');
 
 // 1.2: Discord.js
 const {Client, GatewayIntentBits, Collection} = require('discord.js')
 
 // 1.3: Misc.
 const process = require(`node:process`)
-const {logMessage} = require('./functions/helpers/logging.js')
+const {logMessage} = require('./functions/utilities/loggingUtils.js')
 console.log()
 logMessage(`Hello, world! From index.js`, `INFO`)
 
@@ -59,11 +59,11 @@ logMessage(`Debug mode: ${debug}`, `INFO`)
 // 2.1: Command and button handlers
 async function initializeHandlers() {
     logMessage(`Initializing command handlers...`, `INFO`)
-    await require('./functions/handlers/handleCommands.js')(client)
+    await require('./functions/handlers/commands.js')(client)
     // require('./functions/handlers/handleButtons.js')(client)
     logMessage(`Command handlers initialized!`, `INFO`)
 
-    await require('./functions/handlers/handleEvents.js')(client)
+    await require('./functions/handlers/events.js')(client)
 
 }
 

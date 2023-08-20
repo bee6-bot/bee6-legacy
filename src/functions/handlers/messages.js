@@ -8,8 +8,8 @@
 // 1. Imports
 // ===============================================
 
-const { getMoney, formatMoney } = require('../helpers/money');
-const { sendEmbed, EmbedType } = require('../helpers/sendEmbed');
+const {getMoney, formatMoney} = require('../utilities/moneyUtils');
+const {sendEmbed, EmbedType} = require('../utilities/embedUtils');
 
 // ===============================================
 // 2. Message Handler

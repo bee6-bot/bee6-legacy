@@ -1,4 +1,4 @@
-const { logMessage } = require('./logging');
+const {logMessage} = require('./loggingUtils');
 /**
  * @name sendEmbed
  * @type module
@@ -46,7 +46,7 @@ const EmbedType = {
 
 const {EmbedBuilder} = require("discord.js");
 
-async function sendEmbed(interaction, type, title, description, ephemeral = true, components = [], edit = false, compact = false) {
+async function embedUtils(interaction, type, title, description, ephemeral = true, components = [], edit = false, compact = false) {
     try {
         let colour, emoji;
 
@@ -108,4 +108,4 @@ async function sendEmbed(interaction, type, title, description, ephemeral = true
     }
 }
 
-module.exports = {sendEmbed, EmbedType};
+module.exports = {sendEmbed: embedUtils, EmbedType};

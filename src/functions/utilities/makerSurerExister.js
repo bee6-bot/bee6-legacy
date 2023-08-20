@@ -4,7 +4,7 @@
  */
 
 
-const {logMessage} = require("./logging");
+const {logMessage} = require("./loggingUtils");
 
 /**
  * @name checkGuild

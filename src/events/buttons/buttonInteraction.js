@@ -1,6 +1,6 @@
 // buttonInteraction
 
-const { sendEmbed, EmbedType } = require("../../functions/helpers/sendEmbed");
+const {sendEmbed, EmbedType} = require("../../functions/utilities/embedUtils");
 const {ActionRowBuilder, ButtonBuilder} = require("discord.js");
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
             if (interaction.customId.startsWith('leaderboard')) {
 
                 await interaction.deferUpdate();
-                const {getLeaderboard, calculateXPUntilLevel} = require('../../functions/helpers/leveling');
+                const {getLeaderboard, calculateXPUntilLevel} = require('../../functions/utilities/levelUtils');
 
                 let leaderboardPage = interaction.customId.split('-')[1];
                 let leaderboard;

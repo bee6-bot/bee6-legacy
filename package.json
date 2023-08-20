@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
-    "env": "node src/functions/helpers/envSetup.js"
+    "env": "node src/functions/utilities/envSetup.js"
   },
   "keywords": [
     "discord",

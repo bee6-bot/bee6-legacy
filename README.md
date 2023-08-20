@@ -20,7 +20,7 @@ Discord server to the next level.
   system tracks members' activity and assigns levels based on their interactions.
 
 - **Moderation Tools**: Keep your server safe and friendly with BEE6's powerful moderation commands. From content
-  filtering to automated warnings, maintain a positive community atmosphere.
+  filtering to automated warnings to continuous message logging, maintain a positive community atmosphere with BEE6.
 
 - **Polls**: Gather opinions and feedback from your community with BEE6's intuitive poll commands. Create polls quickly
   and see real-time results.

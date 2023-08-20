@@ -1,9 +1,9 @@
 const {SlashCommandBuilder, ActionRowBuilder, ButtonBuilder} = require('discord.js');
-const {logMessage} = require('../../functions/helpers/logging');
+const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From leaderboard.js`, `INFO`);
 
-const {getLeaderboard, calculateXPUntilLevel} = require('../../functions/helpers/leveling');
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
+const {getLeaderboard, calculateXPUntilLevel} = require('../../functions/utilities/levelUtils');
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
 
 module.exports = {
 
@@ -19,7 +19,9 @@ module.exports = {
             const user = await interaction.client.users.fetch(leaderboard[i].userID);
             const level = leaderboard[i].level;
             const xp = (leaderboard[i].xp + calculateXPUntilLevel(level)).toFixed(0).toLocaleString();
-            leaderboardString += `${i + 1}. **${i === 0 ? `:trophy: ` : ``}${user.username}** - Level ${level} (${xp} XP)\n`;
+            // Check if the user is still in the server
+            if (!interaction.guild.members.cache.has(user.id)) leaderboardString += `${i + 1}. **${i === 0 ? `:trophy: ` : ``}~~${user.username}~~** - Level ${level} (${xp} XP)\n`;
+            else leaderboardString += `${i + 1}. **${i === 0 ? `:trophy: ` : ``}<@${user.id}>** - Level ${level} (${xp} XP)\n`;
         }
 
         const leaderboardNavigation = new ActionRowBuilder()

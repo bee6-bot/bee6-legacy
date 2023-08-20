@@ -1,7 +1,7 @@
-const {formatMoney, setMoney, getMoney} = require('../../functions/helpers/money');
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed')
+const {formatMoney, setMoney, getMoney} = require('../../functions/utilities/moneyUtils');
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils')
 const {SlashCommandBuilder} = require('discord.js');
-const { getCooldown, setCooldown } = require('../../functions/helpers/cooldownManager');
+const {getCooldown, setCooldown} = require('../../functions/utilities/cooldownManager');
 
 module.exports = {
     data: new SlashCommandBuilder()

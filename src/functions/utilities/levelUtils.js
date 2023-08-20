@@ -8,7 +8,7 @@
 // 1. Imports
 // ===============================================
 
-const {logMessage} = require('../../functions/helpers/logging');
+const {logMessage} = require('./loggingUtils');
 const {Snowflake} = require('discord.js');
 logMessage(`Hello, world! From leveling.js`, `INFO`);
 const userModel = require('../../models/userModel');
@@ -112,7 +112,7 @@ async function addXP(userID, guildID, length, message) {
 /**
  * @name getLevelData
  * @description Get a user's XP and level
- * @param {} userID User ID
+ * @param {Snowflake} userID User ID
  * @param {string} guildID Guild ID
  * @returns {Promise<{level: number, xp: number, xpNeeded: number}>}
  * @throws {Error} If an error occurs while getting XP

@@ -1,14 +1,12 @@
-const {logMessage} = require('../../functions/helpers/logging');
+const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From messageCreate.js`, `INFO`);
 
 require('dotenv').config();
 
-const {addXP, getLevelData} = require('../../functions/helpers/leveling');
-const {addMoney} = require('../../functions/helpers/money');
+const {addXP} = require('../../functions/utilities/levelUtils');
 const {Snowflake} = require('discord.js');
-const {checkUser} = require('../../functions/helpers/makerSurerExister');
+const {checkUser} = require('../../functions/utilities/makerSurerExister');
 const fs = require('fs');
-// const fetch = require('node-fetch');
 
 const cooldowns = {'xp': { /* userID, guildID, timestamp */}}
 
@@ -56,11 +54,12 @@ module.exports = {
          */
 
         async function aiReply(message, context) {
+            // Uses https://github.com/BeauTheBeau/ai-api
             const response = await fetch(`http://0.0.0.0:8000/generate/${encodeURIComponent(message)}/${encodeURIComponent(context)}`);
             return await response.json();
         }
 
-        const {getLevelData} = require('../../functions/helpers/leveling');
+        const {getLevelData} = require('../../functions/utilities/levelUtils');
 
         // If the message was a reply to BEE6
         if (message.mentions.has(client.user.id)) {
