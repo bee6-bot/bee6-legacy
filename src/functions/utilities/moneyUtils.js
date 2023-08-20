@@ -10,7 +10,7 @@
 // ===============================================
 
 const userModel = require('../../models/userModel');
-
+const { Snowflake } = require('discord.js');
 // ===============================================
 // 2. Functions
 // ===============================================
@@ -68,7 +68,7 @@ async function removeMoney(userID, guildID, amount) {
 /**
  * @name setMoney
  * @description Set a user's balance
- * @param {string} userID User ID
+ * @param {Snowflake} userID User ID
  * @param {string} guildID Guild ID
  * @param {number} amount Amount to set
  * @param {boolean} bank Whether to set the bank or cash
@@ -92,9 +92,9 @@ async function setMoney(userID, guildID, amount, bank = false) {
 /**
  * @name getMoney
  * @description Get a user's balance
- * @param {} userID User ID
+ * @param {Snowflake} userID User ID
  * @param {string} guildID Guild ID
- * @returns {Promise<number>} User's balance
+ * @returns {Promise<{bank: *, cash: *}>} User's balance
  * @throws {Error} If an error occurs while getting money
  * @throws {Error} If the user does not exist
  */
@@ -105,7 +105,7 @@ async function getMoney(userID, guildID) {
     if (!user) throw new Error(`User does not exist.`);
 
     // Return the money
-    return { cash: user.cash, bank: user.bank };
+    return { bank: user.bank, cash: user.cash };
 }
 
 /**
@@ -129,4 +129,4 @@ function formatMoney(amount) {
 // 3. Exports
 // ===============================================
 
-module.exports = { addMoney, removeMoney, setMoney, getMoney, formatMoney }
+module.exports = { addMoney, setMoney, getMoney, formatMoney }

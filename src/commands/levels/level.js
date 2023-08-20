@@ -1,10 +1,10 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {logMessage} = require('../../functions/helpers/logging');
+const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From level.js`, `INFO`);
 
-const {getLevelData} = require('../../functions/helpers/leveling');
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
-const {drawProgressBar} = require('../../functions/helpers/draw');
+const {getLevelData} = require('../../functions/utilities/levelUtils');
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
+const {drawProgressBar} = require('../../functions/utilities/draw');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,10 +14,10 @@ module.exports = {
 
     async execute(interaction) {
         const user = interaction.options.getUser('user') || interaction.user;
-        const {level, xp, xpNeeded} = await getLevelData(user.id, interaction.guild.id);
+        const {level, xp, xpNeeded, xpTotal} = await getLevelData(user.id, interaction.guild.id);
 
-        const percentage = Math.round((xp / xpNeeded) * 100);
+        const percentage = Math.floor((xp / (xpNeeded + xp)) * 100);
         const progressBar = drawProgressBar(percentage, 20);
-        await sendEmbed(interaction, EmbedType.INFO, `Level`, `Level: ${level.toFixed(0)}\nXP: ${xp.toFixed(0)} / ${xpNeeded.toFixed(0)}\n${progressBar}`);
+        await sendEmbed(interaction, EmbedType.INFO, `Level`, `Level: ${level.toFixed(0)}\nXP: ${xp.toFixed(0)} / ${xpTotal.toFixed(0)}\n${progressBar}`);
     }
 }

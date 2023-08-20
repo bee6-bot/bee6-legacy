@@ -1,7 +1,7 @@
-const {addMoney, formatMoney} = require('../../functions/helpers/money')
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed')
+const {addMoney, formatMoney} = require('../../functions/utilities/moneyUtils')
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils')
 const {SlashCommandBuilder} = require('discord.js');
-
+const {getCooldown, setCooldown} = require('../../functions/utilities/cooldownManager');
 
 module.exports = {
 
@@ -43,6 +43,10 @@ module.exports = {
             ["🎤 Karaoke Star", "You worked as a karaoke host and earned <money>!", 180, 350],
         ];
 
+        const cooldown = await getCooldown(interaction.user.id, interaction.guild.id, 'work');
+        if (cooldown !== false) return await sendEmbed(interaction, EmbedType.ERROR, 'Work', `You can work again <t:${Math.floor(cooldown / 1000)}:R>`, false);
+        if (await setCooldown(interaction.user.id, interaction.guild.id, 'work') === false) return await sendEmbed(interaction, EmbedType.ERROR, 'Work', 'An error occurred while setting your cooldown.', false);
+
         const randomAmount = (min, max) => {
             const randomNum = Math.random() * (max - min) + min;
             return parseFloat(randomNum.toFixed(2));
@@ -59,7 +63,6 @@ module.exports = {
         const jobMessage = await pickRandomJobMessage();
         const jobTitle = jobMessage[0], jobDescription = jobMessage[1];
         await addMoney(interaction.user.id, interaction.guild.id, randomAmount(100, 500));
-
-        await sendEmbed(interaction, EmbedType.SUCCESS, jobTitle, jobDescription);
+        await sendEmbed(interaction, EmbedType.SUCCESS, jobTitle, jobDescription, false);
     }
 }

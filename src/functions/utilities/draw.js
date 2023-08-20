@@ -17,16 +17,13 @@
 
 function drawProgressBar(percent, length, fillChar = `🟦`, emptyChar = `⬛`) {
 
-    if (percent < 0 || percent > 100) throw new Error(`Percent must be between 0 and 100.`);
+    if (percent < 0 || percent > 100) percent = 100;
     if (length <= 0) throw new Error(`Length must be positive.`);
 
     // Calculate the number of characters to fill and return the progress bar
     const fillLength = Math.ceil((percent / 100) * length);
-    return `${fillChar.repeat(fillLength)}${emptyChar.repeat(length - fillLength)}`;
+    return `${fillChar.repeat(fillLength)} ${emptyChar.repeat(length - fillLength)}`;
 
 }
-
-console.log(drawProgressBar(78, 20)); // =====----
-
 
 module.exports = { drawProgressBar };

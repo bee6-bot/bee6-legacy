@@ -11,12 +11,31 @@ const guildSchema = new mongoose.Schema({
     mutedRoleID: {type: String, default: ''},
     modLogChannelID: {type: String, default: ''},
     modLog: {type: Boolean, default: false},
+    continuousMessageLogging: {type: Boolean, default: false},
+    continuousMessageLoggingChannelID: {type: String, default: ''},
     modLogIgnore: {
         channels: {type: Array, default: []},
         roles: {type: Array, default: []},
         users: {type: Array, default: []},
         events: {type: Array, default: []}
     },
+
+    // Cooldowns
+    workCooldown: {type: Number, default: 180000}, // 3 minutes
+    TrobCooldown: {type: Number, default: 300000}, // 5 minute
+    gambleCooldown: {type: Number, default: 300000}, // 5 minutes
+
+    // XP
+    xp: {type: Boolean, default: true},
+    lastMee6Sync: {type: Number, default: 0},
+    mee6Syncing: {type: Boolean, default: false},
+    xpIgnore: {
+        channels: {type: Array, default: []},
+        roles: {type: Array, default: []},
+        users: {type: Array, default: []}
+    },
+    xpCooldown: {type: Number, default: 60}, // Intended for dynamic XP cooldown (based on guild activity), yet to be implemented
+
 
     // Welcome
     welcome: {type: Boolean, default: false},

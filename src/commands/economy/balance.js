@@ -1,5 +1,5 @@
-const {getMoney, formatMoney} = require('../../functions/helpers/money');
-const {sendEmbed, EmbedType} = require('../../functions/helpers/sendEmbed');
+const {getMoney, formatMoney} = require('../../functions/utilities/moneyUtils');
+const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
 const {SlashCommandBuilder} = require('discord.js');
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
             EmbedType.INFO,
             `Balance`,
             `**:pound: Cash:** ${formatMoney(cash)}\n**:bank: Bank:** ${formatMoney(bank)}`,
-            true
+            false
         );
     }
 }

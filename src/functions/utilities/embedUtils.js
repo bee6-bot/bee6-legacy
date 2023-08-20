@@ -1,4 +1,6 @@
-const { logMessage } = require('./logging');
+const {logMessage} = require('./loggingUtils');
+const userModel = require('../../models/userModel');
+
 /**
  * @name sendEmbed
  * @type module
@@ -46,7 +48,12 @@ const EmbedType = {
 
 const {EmbedBuilder} = require("discord.js");
 
-async function sendEmbed(interaction, type, title, description, ephemeral = true, components = [], edit = false, compact = false) {
+async function embedUtils(interaction, type, title, description, ephemeral = true, components = [], edit = false) {
+
+    // Get user configs
+    const user = await userModel.findOne({userID: interaction.user.id, guildID: interaction.guild.id});
+    let compact = user.preferences.compactMode || false;
+
     try {
         let colour, emoji;
 
@@ -77,9 +84,7 @@ async function sendEmbed(interaction, type, title, description, ephemeral = true
                 .setTimestamp();
 
             // Check if components is an array
-            if (components && !Array.isArray(components)) {
-                throw new Error('Components must be an array.');
-            }
+            if (components && !Array.isArray(components)) throw new Error('Components must be an array.');
 
             // Reply to the interaction with the embed
             try {
@@ -87,6 +92,7 @@ async function sendEmbed(interaction, type, title, description, ephemeral = true
                 else await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
             } catch (err) {
                 if (err.code === 10062) await interaction.editReply({embeds: [embed]});
+                if (err.code === "InteractionAlreadyReplied") await interaction.editReply({embeds: [embed]});
                 else {
                     logMessage(`Error sending embed: ${err.stack}`, 'ERROR');
                     throw err;
@@ -108,4 +114,4 @@ async function sendEmbed(interaction, type, title, description, ephemeral = true
     }
 }
 
-module.exports = {sendEmbed, EmbedType};
+module.exports = {sendEmbed: embedUtils, EmbedType};

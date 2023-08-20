@@ -1,4 +1,4 @@
-# BEE6—Your All-in-One Discord Bot
+# BEE6
 
 Welcome to BEE6, the versatile and feature-packed Discord bot designed to cater to all your server's needs. As a free
 and open-source alternative to MEE6 and other popular bots, BEE6 offers a wide range of functionalities to elevate your
@@ -20,7 +20,7 @@ Discord server to the next level.
   system tracks members' activity and assigns levels based on their interactions.
 
 - **Moderation Tools**: Keep your server safe and friendly with BEE6's powerful moderation commands. From content
-  filtering to automated warnings, maintain a positive community atmosphere.
+  filtering to automated warnings to continuous message logging, maintain a positive community atmosphere with BEE6.
 
 - **Polls**: Gather opinions and feedback from your community with BEE6's intuitive poll commands. Create polls quickly
   and see real-time results.
@@ -46,7 +46,7 @@ Discord server to the next level.
 ## Installation and Setup
 
 To add BEE6 to your Discord server, simply click on the following
-link: [Invite BEE6](https://beauthebeau.github.io/bee6/invite)
+link: [Invite BEE6](https://bee6-bot/bee6/invite)
 
 After inviting BEE6, you can set up and customize the bot's features using simple commands. For a full list of commands
 and their usage, type `/help` in your Discord server.
@@ -54,10 +54,14 @@ and their usage, type `/help` in your Discord server.
 ## Support and Feedback
 
 Have questions or need assistance with BEE6? Join our support
-server: [BEE6 Support Server](https://beauthebeau.github.io/bee6/support)
+server: [BEE6 Support Server](https://bee6-bot/bee6/support)
 
 We value your feedback and suggestions! Feel free to share your thoughts with us in the support server or create an
-issue on our GitHub repository: [BEE6 GitHub Repository](https://github.com/beauthebeau/bee6)
+issue on our GitHub repository: [BEE6 GitHub Repository](https://github.com/bee6-bot/bee6)
+
+### Beta Testing
+
+Want to try out BEE6's latest features before they're released? Join our [Discord server](https://bee6-bot/bee6/support)
 
 ## Contributing
 

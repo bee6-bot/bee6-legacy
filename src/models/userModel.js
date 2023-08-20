@@ -16,8 +16,10 @@ const userSchema = new mongoose.Schema({
     isBotDonater: {type: Boolean, default: false},
 
     // Leveling
-    xp: {type: Number, default: 0},
     level: {type: Number, default: 0},
+    totalXP: {type: Number, default: 0}, // Total XP ever earned
+    xp: {type: Number, default: 0}, // Total XP at current level
+    xpNeeded: {type: Number, default: 110}, // XP needed to level up
 
     // Economy
     cash: {type: Number, default: 0},
@@ -46,12 +48,12 @@ const userSchema = new mongoose.Schema({
     infractions: {type: Array, default: 0},
 
     // Fun
-    favoriteColour: {type: String, default: 'None'},
-    favoriteAnimal: {type: String, default: 'None'},
-    favoriteFood: {type: String, default: 'None'},
-    favoriteGame: {type: String, default: 'None'},
-    favoriteMovie: {type: String, default: 'None'},
-    favoriteShow: {type: String, default: 'None'},
+    favouriteColour: {type: String, default: 'None'},
+    favouriteAnimal: {type: String, default: 'None'},
+    favouriteFood: {type: String, default: 'None'},
+    favouriteGame: {type: String, default: 'None'},
+    favouriteMovie: {type: String, default: 'None'},
+    favouriteShow: {type: String, default: 'None'},
 
     // Preferences
     preferences: {
@@ -62,7 +64,6 @@ const userSchema = new mongoose.Schema({
         // Leveling
         levelUpMessages: {type: Boolean, default: true},
         levelUpDMs: {type: Boolean, default: false}, // Send level up message in DMs
-
     },
 
     // Social Media
