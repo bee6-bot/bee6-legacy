@@ -2,11 +2,14 @@ const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From messageCreate.js`, `INFO`);
 
 require('dotenv').config();
-
+const bcrypt = require('bcrypt');
+const {AI_ENABLED, AI_URL} = process.env;
 const {addXP} = require('../../functions/utilities/levelUtils');
 const {Snowflake} = require('discord.js');
 const {checkUser} = require('../../functions/utilities/makerSurerExister');
+const User = require('../../models/userModel');
 const fs = require('fs');
+const {levenshteinDistance} = require('../../functions/utilities/comparisonUtils');
 
 const cooldowns = {'xp': { /* userID, guildID, timestamp */}}
 
@@ -29,6 +32,29 @@ module.exports = {
         async function awardXP(userID, guildID, message) {
 
             await checkUser(userID, guildID);
+            const user = await User.findOne({userID: userID, guildID: guildID});
+            const last10Messages = user.last10Messages;
+
+            if (last10Messages.length >= 10) last10Messages.shift();
+            user.last10Messages.push(bcrypt.hashSync(message.content.toLowerCase(), 10));
+
+            for (const msg of last10Messages) {
+
+                // If they're the exact same message
+                if (msg === bcrypt.hashSync(message.content.toLowerCase(), 10)) {
+                    if (process.env.DEBUG === true) logMessage(`Not awarding XP to ${userID} in ${guildID} because of exact match`, `INFO`);
+                    return;
+                }
+
+                // TODO: Appropriate technique for hashed values
+                //       Fun fact: bcrypt hashes are different every time!
+                // if (levenshteinDistance(msg, bcrypt.hashSync(message.content.toLowerCase(), 10)) <= 5) {
+                //     if (process.env.DEBUG === "true") logMessage(`Not awarding XP to ${userID} in ${guildID} because of similarity`, `INFO`);
+                //     return;
+                // }
+            }
+
+            await user.save();
 
             if (cooldowns.xp[userID] && cooldowns.xp[userID][guildID]) {
                 if (cooldowns.xp[userID][guildID] > Date.now()) return;
@@ -55,7 +81,7 @@ module.exports = {
 
         async function aiReply(message, context) {
             // Uses https://github.com/BeauTheBeau/ai-api
-            const response = await fetch(`http://0.0.0.0:8000/generate/${encodeURIComponent(message)}/${encodeURIComponent(context)}`);
+            const response = await fetch(`${AI_URL}/generate/${encodeURIComponent(message)}/${encodeURIComponent(context)}`);
             return await response.json();
         }
 
@@ -64,6 +90,7 @@ module.exports = {
         // If the message was a reply to BEE6
         if (message.mentions.has(client.user.id)) {
 
+            if (AI_ENABLED !== "true") return;
             let responseSent = false;
 
             let context = fs.readFileSync('./context.txt', 'utf8');
@@ -88,7 +115,10 @@ module.exports = {
             const response = await aiReply(prompt, context);
             let endTime = Date.now();
             console.log(`AI response time: ${endTime - startTime}ms`);
-            await message.reply({ content: `${response.text}\n\`[AI Response Time: ${endTime - startTime}ms]\``, allowedMentions: { repliedUser: true } });
+            await message.reply({
+                content: `${response.text}\n\`[AI Response Time: ${endTime - startTime}ms]\``,
+                allowedMentions: {repliedUser: true}
+            });
             responseSent = true;
         }
 
