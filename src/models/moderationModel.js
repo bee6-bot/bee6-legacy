@@ -8,7 +8,7 @@ const moderationSchema = new mongoose.Schema({
     moderatorID: {type: String, required: true},
 
     // Punishment
-    punishmentType: {type: String, required: true, enum: [`warn`, `kick`, `ban`, `mute`]},
+    punishmentType: {type: String, required: true, enum: [`warn`, `kick`, `ban`, `mute`, `unmute`]},
     punishmentID: {type: String, required: true},
     punishmentReason: {type: String, required: true},
     punishmentDate: {type: Date, required: true, default: Date.now},
