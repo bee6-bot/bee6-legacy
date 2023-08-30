@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     inventory: {type: Array, default: []},
 
     // Stats
+    last10Messages: {type: Array, default: []}, // Array of their last 10 messages (salted and hashed) to prevent spamming for XP
     messages: {type: Number, default: 0},
     commands: {type: Number, default: 0},
     polls: {type: Number, default: 0},

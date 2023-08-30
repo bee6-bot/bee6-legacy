@@ -1,6 +1,7 @@
 const {SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
 const userModel = require('../../models/userModel');
+const {writeFile} = require("fs");
 
 module.exports = {
 
@@ -94,7 +95,29 @@ module.exports = {
         switch (subcommand) {
 
             case 'my-data':
-                await sendEmbed(interaction, EmbedType.INFO, 'User Data', `\`\`\`json\n${JSON.stringify(user, null, 2)}\`\`\``);
+
+                await interaction.reply({content: 'Generating your data...', ephemeral: true});
+
+                // Create a .json file with the user's data
+                const data = JSON.stringify(user, null, 2);
+                const filename = `${userID}-${guildID}.json`;
+                writeFile(filename, data, (err) => {
+                    if (err) throw err;
+                });
+
+                // Send the file to the user
+                await interaction.editReply({content: 'Here is your data:', files: [filename]});
+                await interaction.followUp({
+                    content: `Please note that this data is not encrypted and may contain sensitive information!`
+                        + `your **last 10 messages** are hashed using bcrypt, which is also used to protect `
+                        + `passwords! So, rest assured, your messages are safe with us! We don't share your data with `
+                        + `any third parties, and we don't sell your data! Remember, you can delete your data at any `
+                        + `time by using \`/user delete-data\`\*, and you can view our privacy policy [here](https://google.com/)\*.`
+                        + `\n\n \* *This is not yet implemented.*`,
+                    ephemeral: true
+                });
+
+
                 break;
 
             case 'favourites':
