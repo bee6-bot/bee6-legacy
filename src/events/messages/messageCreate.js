@@ -3,7 +3,7 @@ logMessage(`Hello, world! From messageCreate.js`, `INFO`);
 
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const {AI_ENABLED, AI_URL} = process.env;
+const {AI_ENABLED, AI_URL, FLUENT_AI} = process.env;
 const {addXP} = require('../../functions/utilities/levelUtils');
 const {Snowflake} = require('discord.js');
 const {checkUser} = require('../../functions/utilities/makerSurerExister');
@@ -137,7 +137,7 @@ module.exports = {
             responseSent = true;
             lastAIResponseTime = Date.now();
 
-        } else if (AI_ENABLED === "true" && Date.now() - lastAIResponseTime <= 10000) {
+        } else if (AI_ENABLED === "true" && Date.now() - lastAIResponseTime <= 10000 && FLUENT_AI === "true") {
 
             if (message.author.id === client.user.id) return;
             const prompt = message.content;
@@ -150,7 +150,6 @@ module.exports = {
             });
 
             lastAIResponseTime = Date.now(); // Update the last AI response time
-
         }
     }
 }
