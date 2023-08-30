@@ -10,14 +10,15 @@ const {checkUser} = require('../../functions/utilities/makerSurerExister');
 const User = require('../../models/userModel');
 const fs = require('fs');
 const {levenshteinDistance} = require('../../functions/utilities/comparisonUtils');
+const {getLevelData} = require('../../functions/utilities/levelUtils');
 
 const cooldowns = {'xp': { /* userID, guildID, timestamp */}}
+let lastAIResponseTime = 0;
 
 module.exports = {
     name: 'messageCreate',
     async execute(client, message) {
 
-        if (message.author.bot) return;
 
         /**
          * @name awardXP
@@ -81,32 +82,40 @@ module.exports = {
 
         async function aiReply(message, context) {
             // Uses https://github.com/BeauTheBeau/ai-api
-            const response = await fetch(`${AI_URL}/generate/${encodeURIComponent(message)}/${encodeURIComponent(context)}`);
+            const response = await fetch(`${AI_URL}/generate/v2/?prompt=${encodeURIComponent(message)}`);
             return await response.json();
         }
 
-        const {getLevelData} = require('../../functions/utilities/levelUtils');
+        const author = message.author;
 
         // If the message was a reply to BEE6
-        if (message.mentions.has(client.user.id)) {
+        if (message.mentions.has(client.user.id) || message.content.toLowerCase().includes('bee6')) {
 
             if (AI_ENABLED !== "true") return;
             let responseSent = false;
 
             let context = fs.readFileSync('./context.txt', 'utf8');
             context = context
+                .replace("[Channel List]", message.guild.channels.cache.map(channel => {
+                    const categoryName = channel.parent ? ` (${channel.parent.name})` : '';
+                    return `${channel.name}${categoryName}`;
+                }).join(", "))
                 .replace("[Server Name]", message.guild.name)
                 .replace("[Server Owner]", message.guild.memberCount)
-                .replace("[Channel Name]", `<#${message.channel.name}>`)
-                .replace("[User]", `@{message.author.id}>`)
+                .replace("[Channel Name]", `<#${message.channel.id}>`)
+                .replace("[User]", `<@${message.author.id}>`)
                 .replace("[Roles]", message.member.roles.cache.map(role => role.name).join(", "))
                 .replace("[Joined]", message.member.joinedAt.toLocaleDateString())
                 .replace("[Level]", await getLevelData(message.author.id, message.guild.id).level)
                 .replace("[XP]", await getLevelData(message.author.id, message.guild.id).xp)
                 .replace("[Time]", new Date().toLocaleTimeString())
 
+
             let startTime = Date.now();
-            const prompt = message.content;
+            let prompt = message.content;
+            if (prompt.includes(`<@${client.user.id}>`)) prompt = prompt.replace(`<@${client.user.id}>`, '');
+            prompt = `u/${author.username}: ${prompt}`;
+
             await message.channel.sendTyping()
             setInterval(async () => {
                 if (!responseSent) await message.channel.sendTyping();
@@ -114,13 +123,34 @@ module.exports = {
 
             const response = await aiReply(prompt, context);
             let endTime = Date.now();
-            console.log(`AI response time: ${endTime - startTime}ms`);
-            await message.reply({
-                content: `${response.text}\n\`[AI Response Time: ${endTime - startTime}ms]\``,
-                allowedMentions: {repliedUser: true}
-            });
+            // Check if the last message in the channel isn't from the author
+            if (message.channel.lastMessage.author.id !== author.id || message.channel.lastMessage.author.id === client.user.id) {
+                await message.reply({
+                    content: `${response.text}`,
+                    allowedMentions: {repliedUser: true}
+                });
+            } else {
+                await message.channel.send({
+                    content: `${response.text}`
+                });
+            }
             responseSent = true;
-        }
+            lastAIResponseTime = Date.now();
 
+        } else if (AI_ENABLED === "true" && Date.now() - lastAIResponseTime <= 10000) {
+
+            if (message.author.id === client.user.id) return;
+            const prompt = message.content;
+            const context = fs.readFileSync('./context.txt', 'utf8')
+            const response = await aiReply(prompt, context);
+
+            // Send the AI response
+            await message.channel.send({
+                content: `${response.text}`
+            });
+
+            lastAIResponseTime = Date.now(); // Update the last AI response time
+
+        }
     }
 }
