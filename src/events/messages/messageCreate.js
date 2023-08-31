@@ -1,5 +1,4 @@
 const {logMessage} = require('../../functions/utilities/loggingUtils');
-logMessage(`Hello, world! From messageCreate.js`, `INFO`);
 
 require('dotenv').config();
 const bcrypt = require('bcrypt');
@@ -128,7 +127,7 @@ module.exports = {
          * @returns {Promise<void>}
          */
 
-        async function aiReply(message, context) {
+        async function aiReply(message, context = "") {
             // Uses https://github.com/BeauTheBeau/ai-api
             const response = await fetch(`${AI_URL}/generate/v2/?prompt=${encodeURIComponent(message)}`);
             return await response.json();
@@ -160,18 +159,13 @@ module.exports = {
                     .replace("[Time]", new Date().toLocaleTimeString())
 
 
-                let startTime = Date.now();
                 let prompt = message.content;
                 if (prompt.includes(`<@${client.user.id}>`)) prompt = prompt.replace(`<@${client.user.id}>`, '');
                 prompt = `u/${author.username}: ${prompt}`;
 
                 await message.channel.sendTyping()
-                setInterval(async () => {
-                    if (!responseSent) await message.channel.sendTyping();
-                }, 5000);
-
                 const response = await aiReply(prompt, context);
-                let endTime = Date.now();
+
                 // Check if the last message in the channel isn't from the author
                 if (message.channel.lastMessage.author.id !== author.id || message.channel.lastMessage.author.id === client.user.id) {
                     await message.reply({
@@ -190,8 +184,7 @@ module.exports = {
 
                 if (message.author.id === client.user.id) return;
                 const prompt = message.content;
-                const context = fs.readFileSync('./context.txt', 'utf8')
-                const response = await aiReply(prompt, context);
+                const response = await aiReply(prompt);
 
                 // Send the AI response
                 await message.channel.send({
