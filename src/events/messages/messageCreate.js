@@ -1,16 +1,16 @@
 const {logMessage} = require('../../functions/utilities/loggingUtils');
-logMessage(`Hello, world! From messageCreate.js`, `INFO`);
 
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const {AI_ENABLED, AI_URL, FLUENT_AI} = process.env;
 const {addXP} = require('../../functions/utilities/levelUtils');
-const {Snowflake} = require('discord.js');
+const {Snowflake, EmbedBuilder} = require('discord.js');
 const {checkUser} = require('../../functions/utilities/makerSurerExister');
 const User = require('../../models/userModel');
 const fs = require('fs');
 const {levenshteinDistance} = require('../../functions/utilities/comparisonUtils');
 const {getLevelData} = require('../../functions/utilities/levelUtils');
+const guildModel = require("../../models/guildModel");
 
 const cooldowns = {'xp': { /* userID, guildID, timestamp */}}
 let lastAIResponseTime = 0;
@@ -19,6 +19,20 @@ module.exports = {
     name: 'messageCreate',
     async execute(client, message) {
 
+        // If the message contains "mee6"
+        if (message.content.toLowerCase().includes('mee6')) {
+            message.react('🤓');
+            message.react('🛡️');
+        }
+
+
+        const guildModel = require('../../models/guildModel');
+        const guildData = await guildModel.findOne({guildID: message.guild.id});
+        const channelIDs = {
+            'welcome': guildData.welcomeChannelID,
+            'leave': guildData.leaveChannelID,
+            'continuousMessageLogging': guildData.continuousMessageLoggingChannelID,
+        }
 
         /**
          * @name awardXP
@@ -70,7 +84,40 @@ module.exports = {
             await addXP(message.author.id, message.guild.id, messageLength, message);
         }
 
-        await awardXP(message.author.id, message.guild.id, message);
+        /**
+         * @name continuousLogging
+         * @description Log messages to a channel if guild.continuousMessageLogging is true
+         * @param {string} message Message
+         * @returns {Promise<void>}
+         */
+
+        async function continuousLogging(message) {
+
+            const clChannel = message.guild.channels.cache.get(channelIDs.continuousMessageLogging);
+            if (message.author.bot) return;
+            if (!clChannel) return;
+            if (message.author.id === client.user.id) return;
+
+            let content = `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id} | ` +
+                `**${message.author.username}** (${message.author.id}) | ` +
+                `${message.content}`;
+
+            if (message.attachments.size > 0) {
+                content += '\n**Attachments:** ';
+                let attachmentNumber = 1;
+                // [attachment #1](url) [attachment #2](url)
+                message.attachments.forEach(attachment => {
+                    content += `[Attachment #${attachmentNumber}](${attachment.url}) `;
+                    attachmentNumber++;
+                });
+            }
+
+            await clChannel.send({content: content});
+        }
+
+        continuousLogging(message).then(() => {
+            awardXP(message.author.id, message.guild.id, message)
+        });
 
         /**
          * @name aiReply
@@ -80,7 +127,7 @@ module.exports = {
          * @returns {Promise<void>}
          */
 
-        async function aiReply(message, context) {
+        async function aiReply(message, context = "") {
             // Uses https://github.com/BeauTheBeau/ai-api
             const response = await fetch(`${AI_URL}/generate/v2/?prompt=${encodeURIComponent(message)}`);
             return await response.json();
@@ -88,68 +135,64 @@ module.exports = {
 
         const author = message.author;
 
-        // If the message was a reply to BEE6
-        if (message.mentions.has(client.user.id) || message.content.toLowerCase().includes('bee6')) {
+        // If the message was sent in a logging channel, ignore it
+        if (message.channel.id !== channelIDs.continuousMessageLogging) {
+            if (message.mentions.has(client.user.id) || message.content.toLowerCase().includes('bee6')) {
 
-            if (AI_ENABLED !== "true") return;
-            let responseSent = false;
+                if (AI_ENABLED !== "true") return;
+                let responseSent = false;
 
-            let context = fs.readFileSync('./context.txt', 'utf8');
-            context = context
-                .replace("[Channel List]", message.guild.channels.cache.map(channel => {
-                    const categoryName = channel.parent ? ` (${channel.parent.name})` : '';
-                    return `${channel.name}${categoryName}`;
-                }).join(", "))
-                .replace("[Server Name]", message.guild.name)
-                .replace("[Server Owner]", message.guild.memberCount)
-                .replace("[Channel Name]", `<#${message.channel.id}>`)
-                .replace("[User]", `<@${message.author.id}>`)
-                .replace("[Roles]", message.member.roles.cache.map(role => role.name).join(", "))
-                .replace("[Joined]", message.member.joinedAt.toLocaleDateString())
-                .replace("[Level]", await getLevelData(message.author.id, message.guild.id).level)
-                .replace("[XP]", await getLevelData(message.author.id, message.guild.id).xp)
-                .replace("[Time]", new Date().toLocaleTimeString())
+                let context = fs.readFileSync('./context.txt', 'utf8');
+                context = context
+                    .replace("[Channel List]", message.guild.channels.cache.map(channel => {
+                        const categoryName = channel.parent ? ` (${channel.parent.name})` : '';
+                        return `${channel.name}${categoryName}`;
+                    }).join(", "))
+                    .replace("[Server Name]", message.guild.name)
+                    .replace("[Server Owner]", message.guild.memberCount)
+                    .replace("[Channel Name]", `<#${message.channel.id}>`)
+                    .replace("[User]", `<@${message.author.id}>`)
+                    .replace("[Roles]", message.member.roles.cache.map(role => role.name).join(", "))
+                    .replace("[Joined]", message.member.joinedAt.toLocaleDateString())
+                    .replace("[Level]", await getLevelData(message.author.id, message.guild.id).level)
+                    .replace("[XP]", await getLevelData(message.author.id, message.guild.id).xp)
+                    .replace("[Time]", new Date().toLocaleTimeString())
 
 
-            let startTime = Date.now();
-            let prompt = message.content;
-            if (prompt.includes(`<@${client.user.id}>`)) prompt = prompt.replace(`<@${client.user.id}>`, '');
-            prompt = `u/${author.username}: ${prompt}`;
+                let prompt = message.content;
+                if (prompt.includes(`<@${client.user.id}>`)) prompt = prompt.replace(`<@${client.user.id}>`, '');
+                prompt = `u/${author.username}: ${prompt}`;
 
-            await message.channel.sendTyping()
-            setInterval(async () => {
-                if (!responseSent) await message.channel.sendTyping();
-            }, 5000);
+                await message.channel.sendTyping()
+                const response = await aiReply(prompt, context);
 
-            const response = await aiReply(prompt, context);
-            let endTime = Date.now();
-            // Check if the last message in the channel isn't from the author
-            if (message.channel.lastMessage.author.id !== author.id || message.channel.lastMessage.author.id === client.user.id) {
-                await message.reply({
-                    content: `${response.text}`,
-                    allowedMentions: {repliedUser: true}
-                });
-            } else {
+                // Check if the last message in the channel isn't from the author
+                if (message.channel.lastMessage.author.id !== author.id || message.channel.lastMessage.author.id === client.user.id) {
+                    await message.reply({
+                        content: `${response.text}`,
+                        allowedMentions: {repliedUser: true}
+                    });
+                } else {
+                    await message.channel.send({
+                        content: `${response.text}`
+                    });
+                }
+                responseSent = true;
+                lastAIResponseTime = Date.now();
+
+            } else if (AI_ENABLED === "true" && Date.now() - lastAIResponseTime <= 10000 && FLUENT_AI === "true") {
+
+                if (message.author.id === client.user.id) return;
+                const prompt = message.content;
+                const response = await aiReply(prompt);
+
+                // Send the AI response
                 await message.channel.send({
                     content: `${response.text}`
                 });
+
+                lastAIResponseTime = Date.now(); // Update the last AI response time
             }
-            responseSent = true;
-            lastAIResponseTime = Date.now();
-
-        } else if (AI_ENABLED === "true" && Date.now() - lastAIResponseTime <= 10000 && FLUENT_AI === "true") {
-
-            if (message.author.id === client.user.id) return;
-            const prompt = message.content;
-            const context = fs.readFileSync('./context.txt', 'utf8')
-            const response = await aiReply(prompt, context);
-
-            // Send the AI response
-            await message.channel.send({
-                content: `${response.text}`
-            });
-
-            lastAIResponseTime = Date.now(); // Update the last AI response time
         }
     }
 }

@@ -24,6 +24,20 @@ module.exports = {
                     .setRequired(true)
                 )
             )
+            .addSubcommand(subcommand => subcommand
+                .setName('mod-log')
+                .setDescription('Configure mod logs (message edits, deletes, etc.).')
+                .addBooleanOption(option => option
+                    .setName('enabled')
+                    .setDescription('Enable or disable mod logs.')
+                    .setRequired(true)
+                )
+                .addChannelOption(option => option
+                    .setName('channel')
+                    .setDescription('The channel to send the logs to.')
+                    .setRequired(true)
+                )
+            )
         ),
 
     async execute(interaction) {
@@ -32,11 +46,11 @@ module.exports = {
         const args = interaction.options.data;
         const guildID = interaction.guild.id;
         const guild = await guildModel.findOne({guildID: guildID});
+        const enabled = interaction.options.getBoolean('enabled');
+        const channel = interaction.options.getChannel('channel');
 
         switch (subcommand) {
             case 'continuous-logging':
-                const enabled = interaction.options.getBoolean('enabled');
-                const channel = interaction.options.getChannel('channel');
                 if (enabled) {
                     guild.continuousMessageLogging = true;
                     guild.continuousMessageLoggingChannelID = channel.id;
@@ -46,6 +60,15 @@ module.exports = {
                 }
 
                 break;
+
+            case 'mod-log':
+                if (enabled) {
+                    guild.modLog = true;
+                    guild.modLogChannelID = channel.id;
+                } else {
+                    guild.modLog = false;
+                    guild.modLogChannelID = '';
+                }
         }
 
         await guild.save();
