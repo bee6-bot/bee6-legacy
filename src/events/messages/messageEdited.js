@@ -7,8 +7,8 @@ module.exports = {
         let content = `**\`EDITED\`** | ` +
             `https://discord.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id} | ` +
             `**${newMessage.author.tag}** (${newMessage.author.id})` +
-            `\n**Before:** \`${newMessage.content}\` | ` +
-            `\n**After:** \`${oldMessage.content}\``;
+            `\n**Before:** ${newMessage.content} | ` +
+            `\n**After:** ${oldMessage.content}`;
 
         if (newMessage.attachments.size > 0) {
             content += '\n**Attachments:** ';

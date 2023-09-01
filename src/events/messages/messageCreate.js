@@ -131,18 +131,28 @@ module.exports = {
          * @description Reply to a message using the AI
          * @param {string} message Message
          * @param {string} context Context
-         * @returns {Promise<void>}
+         * @returns {Promise<{text: string}>}
          */
 
         async function aiReply(message, context = "") {
             // Uses https://github.com/BeauTheBeau/ai-api
-            const response = await fetch(`${AI_URL}/generate/v2/?prompt=${encodeURIComponent(message)}`);
-            return await response.json();
+            const start = Date.now();
+            let response;
+            if (context !== "") response = await fetch(`${AI_URL}/generate/v3/?prompt=${encodeURIComponent(message)}&context=${encodeURIComponent(context)}`);
+            else response = await fetch(`${AI_URL}/generate/v3/nocontext/?prompt=${encodeURIComponent(message)}`);
+
+            response = await response.json();
+            const end = Date.now();
+            if (response === "gpt model did not return a response, try modifying your prompt") return {
+                text: "I'm sorry, I don't know how to respond to that :poop:",
+                time: end - start
+            };
+
+            return {text: response.text, time: end - start};
         }
 
-        const author = message.author;
-
         if (await isLoggingChannel(message.channel.id)) return;
+        if (message.channel.id === "1146117922310344864") return;
         if (message.mentions.has(client.user.id) || message.content.toLowerCase().includes('bee6')) {
 
             if (message.content.toLowerCase().includes('bee6') && message.author.id === client.user.id) return;
@@ -153,11 +163,21 @@ module.exports = {
             prompt = `${prompt}`;
 
             await message.channel.sendTyping()
-            const response = await aiReply(prompt);
+            let context = fs.readFileSync('./context.txt', 'utf8');
+            context = context
+                .replace(`[Server Name]`, message.guild.name)
+                .replace(`[Server Owner]`, null)
+                .replace(`[Channel Name]`, message.channel.name)
+                .replace(`[Channel List]`, message.guild.channels.cache.map(channel => channel.name).join(', '))
+                .replace(`[Member List]`, message.guild.members.cache.map(member => member.user.username).join(', '))
+                .replace(`[User]`, message.author.username)
+                .replace(`[Roles]`, message.guild.roles.cache.map(role => role.name).join(', '))
+                .replace(`[Date]`, message.member.joinedAt)
+                .replace(`[Time]`, new Date().toLocaleTimeString());
 
-            // Check if the last message in the channel isn't from the author
+            const response = await aiReply(prompt, context);
             await message.reply({
-                content: `${response.text}`,
+                content: `\`V3\` \`Took ${response.time}ms\` ${response.text}`,
                 allowedMentions: {repliedUser: true}
             });
 
@@ -171,7 +191,7 @@ module.exports = {
 
             // Send the AI response
             await message.channel.send({
-                content: `${response.text}`
+                content: `\`V2\` ${response.text}`
             });
 
             lastAIResponseTime = Date.now(); // Update the last AI response time
