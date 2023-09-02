@@ -1,3 +1,7 @@
+# Project specific ignores
+context.txt
+*.log
+
 ### MonoDevelop template
 #User Specific
 *.userprefs
