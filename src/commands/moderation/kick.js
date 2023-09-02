@@ -51,13 +51,13 @@ module.exports = {
 
         const userDocument = await userModel.findOne({guildID: interaction.guild.id, userID: user.id});
         if (userDocument) {
-            userDocument.punishments.push(punishment);
+            userDocument.kicks.push(punishment);
             userDocument.save();
         } else {
             const newUser = new userModel({
                 guildID: interaction.guild.id,
                 userID: user.id,
-                punishments: [punishment]
+                kicks: [punishment]
             });
             await newUser.save();
         }

@@ -2,6 +2,7 @@ const {SlashCommandBuilder, PermissionsBitField, ButtonBuilder, ActionRowBuilder
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
 const userModel = require('../../models/userModel');
 const moderationModel = require('../../models/moderationModel');
+const {checkUser} = require("../../functions/utilities/makerSurerExister");
 
 module.exports = {
 
@@ -30,16 +31,16 @@ module.exports = {
                 {name: '1 hour', value: '3600'},
                 {name: '1 day', value: '86400'},
                 {name: '1 week', value: '604800'},
-                {name: 'remove', value: null}
+                {name: 'remove', value: '0'}
             )),
 
     async execute(interaction) {
 
-        const user = interaction.options.getUser(`user`);
+        const user = interaction.options.getMember(`user`);
         const reason = interaction.options.getString(`reason`);
         let duration = interaction.options.getString(`duration`);
 
-        if (!duration === null) duration *= 1000;
+        if (!duration === '0') duration *= 1000;
 
         const punishmentID = Math.random().toString(36).substring(2, 9);
         const punishment = new moderationModel({
@@ -70,24 +71,25 @@ module.exports = {
                     .setEmoji(`🔇`)
             );
 
+        await checkUser(interaction.guild.id, user.id);
         const userDocument = await userModel.findOne({guildID: interaction.guild.id, userID: user.id});
         if (userDocument) {
-            userDocument.punishments.push(punishment);
+            userDocument.mutes.push(punishment);
             userDocument.save();
         } else {
             const newUser = new userModel({
                 guildID: interaction.guild.id,
                 userID: user.id,
-                punishments: [punishment]
+                mutes: [punishment]
             });
             await newUser.save();
         }
 
         await punishment.save();
+        await user.timeout(parseInt(duration), reason);
         await sendEmbed(interaction, EmbedType.SUCCESS,
-            `${duration === null ? `Unmuted` : `Muted`} ${user.username}`, `\`ID: ${punishmentID}\` | **${duration === null ? `Unmuted` : `Muted`} for:** ${reason}`, false, [buttonRow]);
+            `${duration === '0' ? `Unmuted` : `Muted`} ${user.user.username}`, `\`ID: ${punishmentID}\` | **${duration === '0' ? `Unmuted` : `Muted`} for:** ${reason}`, false, [buttonRow]);
 
-        await user.timeout(duration);
 
     }
 
