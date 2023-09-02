@@ -6,41 +6,55 @@ Discord server to the next level.
 
 ## Features
 
-- **Customized Welcome and Goodbye Messages**: Create warm and personalized welcome messages for new members and bid
+- `DOING` **Powerful Settings**: Customize BEE6's features to suit your indidual server's needs. BEE6 offers a wide
+  range of
+  settings to help you create the bot for you.
+
+- `TODO` **Customized Welcome and Goodbye Messages**: Create warm and personalized welcome messages for new members and
+  bid
   farewell with unique goodbye messages when members leave. Customize these messages to match your server's style and
   tone.
 
-- **Social Media Alerts**: Keep your community in the loop with your latest social media updates. BEE6 can automatically
+- `TODO` **Social Media Alerts**: Keep your community in the loop with your latest social media updates. BEE6 can
+  automatically
   post your tweets, YouTube videos, and more directly into your Discord server.
 
-- **Reaction Roles**: Simplify the role assignment process by allowing members to react to specific messages and get
+- `TODO` **Reaction Roles**: Simplify the role assignment process by allowing members to react to specific messages and
+  get
   roles instantly. Manage your community's roles with ease.
 
-- **Leveling System**: Encourage engagement and reward your members for being active on your server. BEE6's leveling
-  system tracks members' activity and assigns levels based on their interactions.
+- `DONE` **Leveling System**: Encourage engagement and reward your members for being active on your server. BEE6's
+  leveling
+  system tracks members' activity and assigns levels based on their interactions. Also offering the option to sync
+  levels with MEE6.
 
-- **Moderation Tools**: Keep your server safe and friendly with BEE6's powerful moderation commands. From content
+- `TODO` **Moderation Tools**: Keep your server safe and friendly with BEE6's powerful moderation commands. From content
   filtering to automated warnings to continuous message logging, maintain a positive community atmosphere with BEE6.
 
-- **Polls**: Gather opinions and feedback from your community with BEE6's intuitive poll commands. Create polls quickly
+- `TODO` **Polls**: Gather opinions and feedback from your community with BEE6's intuitive poll commands. Create polls
+  quickly
   and see real-time results.
 
-- **Custom Commands**: Expand BEE6's functionality by creating your own custom commands. Design commands that fetch
+- `TODO` **Custom Commands**: Expand BEE6's functionality by creating your own custom commands. Design commands that
+  fetch
   information, display server stats, or trigger entertaining responses.
 
-- **Auto-Moderation**: Enable BEE6's auto-moderation to automatically detect and handle offensive content, spam, and
+- `TODO` **Auto-Moderation**: Enable BEE6's auto-moderation to automatically detect and handle offensive content, spam,
+  and
   other rule violations in your server.
 
-- **Advanced Logging**: Keep track of important events and actions in your server with BEE6's extensive logging
+- `DOING` **Advanced Logging**: Keep track of important events and actions in your server with BEE6's extensive logging
   features. Monitor user actions, message deletions, and more.
 
-- **Birthday Celebrations**: Never miss a member's birthday! BEE6 will send automatic birthday wishes to your members,
+- `TODO` **Birthday Celebrations**: Never miss a member's birthday! BEE6 will send automatic birthday wishes to your
+  members,
   making them feel appreciated on their special day.
 
-- **Fun Mini-games**: If you're looking for some fun and entertainment, enable BEE6's mini games.
+- `TODO` **Fun Mini-games**: If you're looking for some fun and entertainment, enable BEE6's mini games.
   Challenge your community members to trivia, quizzes, and other exciting activities.
 
-- **Economy System**: Create a virtual economy in your server with BEE6's economy system. Members can earn currency by
+- `DOING` **Economy System**: Create a virtual economy in your server with BEE6's economy system. Members can earn
+  currency by
   being active and use it to purchase items and play games.
 
 ## Installation and Setup
