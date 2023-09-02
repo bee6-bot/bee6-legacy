@@ -9,15 +9,17 @@ const { join } = require('path');
 const eventDirs = readdirSync(join(__dirname, '../../events'));
 
 module.exports = async (client) => {
-
     for (const dir of eventDirs) {
         const events = readdirSync(join(__dirname, '../../events', dir)).filter(file => file.endsWith('.js'));
-        logMessage(`Loading ${events.length} events from ${dir}`, `INFO`);
+
         for (const file of events) {
-            const event = require(`../../events/${dir}/${file}`);
-            client.on(event.name, event.execute.bind(null, client));
-            logMessage(`Loaded event ${event.name}`, `INFO`);
+            const eventArray = require(`../../events/${dir}/${file}`);
+
+            if (Array.isArray(eventArray)) {
+                for (const eventObj of eventArray) {
+                    client.on(eventObj.name, eventObj.execute.bind(null, client));
+                }
+            } else client.on(eventArray.name, eventArray.execute.bind(null, client)); // Handle when a single event object is exported
         }
     }
 }
-
