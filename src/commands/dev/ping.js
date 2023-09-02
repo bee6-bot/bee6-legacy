@@ -21,6 +21,9 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(githubButton, inviteButton)
 
+        // run git command to get branch
+        const gitBranch = require('child_process').execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+
         await sendEmbed(
             interaction,
             EmbedType.INFO,
@@ -29,12 +32,15 @@ module.exports = {
             + `**Client Latency** is ${Date.now() - interaction.createdTimestamp}ms\n`
             + `**API Latency** is ${Math.round(interaction.client.ws.ping)}ms\n`
             + `**Uptime:** ${Math.floor(interaction.client.uptime / 1000 / 60 / 60)} hours, ${Math.floor(interaction.client.uptime / 1000 / 60) % 60} minutes, ${Math.floor(interaction.client.uptime / 1000) % 60} seconds\n`
+            + `**Git branch:** ${gitBranch}\n`
+            + `**AI Enabled:** ${process.env.AI_ENABLED === 'true' ? 'Yes' : 'No'}\n`
+            + `**Fluent AI:** ${process.env.FLUENT_AI === 'true' ? 'Yes' : 'No'}\n`
 
             + `## Server Stats\n`
             + `**Guilds:** ${interaction.client.guilds.cache.size}\n`
             + `**Users:** ${interaction.client.users.cache.size}\n`
             + `**Channels:** ${interaction.client.channels.cache.size}\n`,
-            true, [row]
+            false, [row]
         )
     }
 }
