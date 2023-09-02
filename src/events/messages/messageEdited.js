@@ -1,8 +1,12 @@
-const guildModel = require("../../models/guildModel");
+const {EmbedBuilder} = require("discord.js");
 
 module.exports = {
     name: 'messageUpdate',
     async execute(client, newMessage, oldMessage) {
+
+        const guildModel = require("../../models/guildModel");
+        if (newMessage.content === oldMessage.content) return;
+        if (newMessage.author.bot) return;
 
         let content = `**\`EDITED\`** | ` +
             `https://discord.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id} | ` +
@@ -25,7 +29,7 @@ module.exports = {
 
         if (!logChannel) return;
 
-        await logChannel.send({content: content});
+        await logChannel.send({embeds: [new EmbedBuilder().setDescription(content)]});
 
     }
 }

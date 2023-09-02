@@ -1,4 +1,5 @@
 const guildModel = require("../../models/guildModel");
+const {EmbedBuilder} = require("discord.js");
 
 module.exports = {
     name: 'messageDelete',
@@ -24,7 +25,7 @@ module.exports = {
 
         if (!logChannel) return;
 
-        await logChannel.send({content: content});
+        await logChannel.send({embeds: [new EmbedBuilder().setDescription(content)]});
 
     }
 }
