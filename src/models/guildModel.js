@@ -52,7 +52,7 @@ const guildSchema = new mongoose.Schema({
     leaveChannelID: {type: String, default: ''},
     leaveMessage: {
         type: String,
-        default: 'Oh no, **{{user}}** left {{guild}! We now have **{{memberCount}}** members!'
+        default: `Oh no, **{{user}}** left {{guild}! We're down to **{{memberCount}}** members!`
     },
     leaveEmbed: {type: Boolean, default: false},
     leaveImage: {type: String, default: ''},
