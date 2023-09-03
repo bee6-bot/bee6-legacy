@@ -1,5 +1,6 @@
 const guildModel = require("../../models/guildModel");
 const {EmbedBuilder} = require("discord.js");
+const {shouldLogEvent} = require("../../functions/utilities/modlogUtils");
 
 
 /**
@@ -125,6 +126,8 @@ module.exports = eventInfo.map(event => ({
     async execute(client, ...args) {
         const logChannel = await getLogChannel(args[0].guild);
         if (!logChannel) return;
+
+        if (!await shouldLogEvent(event, args[0].id, args[0].roles, args[0].id)) return;
 
         const content = await event.getDescription(...args, client)
         await logChannel.send({embeds: [new EmbedBuilder().setDescription(content.replace('[EVENT TYPE]', event.eventType))]})
