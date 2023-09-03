@@ -7,6 +7,21 @@ const guildModel = require("../../models/guildModel");
 const userModel = require("../../models/userModel");
 const {EmbedBuilder} = require("discord.js");
 
+let placeholders = {
+    user: ``,
+    guild: ``,
+    server: ``,
+    memberCount: ``,
+    members: ``,
+    username: ``,
+    displayName: ``,
+    tag: ``,
+    xp: ``,
+    level: ``,
+    cash: ``,
+    bank: ``,
+};
+
 /**
  * @name getChannel
  * @param {Guild} guild
@@ -47,7 +62,7 @@ async function sendWelcomeLeaveMessage(member, type) {
 
     if (message === '') return;
 
-    const placeholders = {
+    placeholders = {
         user: `<@${member.id}>`,
         guild: member.guild.name,
         server: member.guild.name,
@@ -77,4 +92,4 @@ async function sendWelcomeLeaveMessage(member, type) {
     await channel.send({embeds: [embed]});
 }
 
-module.exports = {getChannel, sendWelcomeLeaveMessage}
+module.exports = {getChannel, sendWelcomeLeaveMessage, placeholders};
