@@ -46,12 +46,31 @@ async function sendWelcomeLeaveMessage(member, type) {
     }
 
     if (message === '') return;
+
+    const placeholders = {
+        user: `<@${member.id}>`,
+        guild: member.guild.name,
+        server: member.guild.name,
+        memberCount: member.guild.memberCount.toString(),
+        members: member.guild.memberCount.toString(),
+        username: member.user.username,
+        displayName: member.displayName,
+        tag: member.user.tag,
+        xp: userData.totalXP.toString(),
+        level: userData.level.toString(),
+        cash: userData.cash.toString(),
+        bank: userData.bank.toString(),
+    };
+
+    let formattedMessage = message;
+
+    for (const placeholder in placeholders) {
+        const regex = new RegExp(`\\{\\{${placeholder}\\}\\}|\\[\\{${placeholder}\\}\\]`, 'g');
+        formattedMessage = formattedMessage.replace(regex, placeholders[placeholder]);
+    }
+
     const embed = new EmbedBuilder()
-        .setDescription(message
-            .replace('{{user}}', `<@${member.id}>`)
-            .replace('{{guild}}', member.guild.name)
-            .replace('{{memberCount}}', member.guild.memberCount.toString())
-        )
+        .setDescription(formattedMessage)
         .setAuthor({name: member.user.username, iconURL: member.user.displayAvatarURL({dynamic: true})})
         .setColor(member.displayHexColor)
 
