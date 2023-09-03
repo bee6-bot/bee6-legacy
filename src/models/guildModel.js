@@ -40,14 +40,20 @@ const guildSchema = new mongoose.Schema({
     // Welcome
     welcome: {type: Boolean, default: false},
     welcomeChannelID: {type: String, default: ''},
-    welcomeMessage: {type: String, default: ''},
+    welcomeMessage: {
+        type: String,
+        default: 'Hey, {{user}}! Welcome to **{{guild}}**! You are the **{{memberCount}}th** member!'
+    },
     welcomeEmbed: {type: Boolean, default: false},
     welcomeImage: {type: String, default: ''},
 
     // Leave
     leave: {type: Boolean, default: false},
     leaveChannelID: {type: String, default: ''},
-    leaveMessage: {type: String, default: ''},
+    leaveMessage: {
+        type: String,
+        default: 'Oh no, **{{user}}** left {{guild}! We now have **{{memberCount}}** members!'
+    },
     leaveEmbed: {type: Boolean, default: false},
     leaveImage: {type: String, default: ''},
 
