@@ -1,4 +1,4 @@
-const {SlashCommandBuilder} = require('discord.js');
+const {SlashCommandBuilder, PermissionsBitField} = require('discord.js');
 const {logMessage} = require('../../functions/utilities/loggingUtils');
 logMessage(`Hello, world! From syncLevels.js`, `INFO`);
 const UserModel = require('../../models/userModel');
@@ -54,7 +54,8 @@ async function updateUserLevelDataBatch(usersData, UserModel, calculateXPUntilNe
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('synclevels')
+        .setName('sync-levels')
+        .setDefaultMemberPermissions(PermissionsBitField.Administrator)
         .setDescription('Sync your levels from MEE6 to BEE6 easily!'),
 
     async execute(interaction) {
