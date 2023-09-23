@@ -26,7 +26,6 @@ module.exports = {
         const gitRemote = require('child_process').execSync('git config --get remote.origin.url').toString().trim();
         const gitRemoteMin = gitRemote.replace(/.*github.com\//, '').replace(/\.git$/, '');
 
-
         await sendEmbed(
             interaction,
             EmbedType.INFO,
@@ -35,10 +34,15 @@ module.exports = {
             + `**Client Latency** is ${Date.now() - interaction.createdTimestamp}ms\n`
             + `**API Latency** is ${Math.round(interaction.client.ws.ping)}ms\n`
             + `**Uptime:** ${Math.floor(interaction.client.uptime / 1000 / 60 / 60)} hours, ${Math.floor(interaction.client.uptime / 1000 / 60) % 60} minutes, ${Math.floor(interaction.client.uptime / 1000) % 60} seconds\n`
-            + `**Git branch:** ${gitBranch}\n`
-            + `**Git remote:** [${gitRemoteMin}](${gitRemote})\n`
-            + `**AI Enabled:** ${process.env.AI_ENABLED === 'true' ? 'Yes' : 'No'}\n`
+
+            + `## Bot Features\n`
             + `**Fluent AI:** ${process.env.FLUENT_AI === 'true' ? 'Yes' : 'No'}\n`
+            + `**AI Enabled:** ${process.env.AI_ENABLED === 'true' ? 'Yes' : 'No'}\n`
+
+            + `## Bot Version\n`
+            + `**Branch:** ${gitBranch}\n`
+            + `**Remote:** [${gitRemoteMin}](${gitRemote})\n`
+            + `**Last Commit:** \`${require('child_process').execSync('git rev-parse HEAD').toString().trim()} ${require('child_process').execSync('git log -1 --pretty=%B').toString().trim()}\`\n`
 
             + `## Server Stats\n`
             + `**Guilds:** ${interaction.client.guilds.cache.size}\n`
