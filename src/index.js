@@ -71,7 +71,7 @@ async function checkForUpdates() {
     const currentCommitDate = require('child_process').execSync('git show -s --format=%ci HEAD').toString().trim();
 
     // If the last commit is older than the current commit, there is a new commit
-    if (lastCommitDate < currentCommitDate) {
+    if (lastCommitDate > currentCommitDate) {
 
         const readInputFromConsole = require('./functions/utilities/core/inputUtils.js')
 
