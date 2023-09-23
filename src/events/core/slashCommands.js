@@ -1,108 +1,89 @@
 require('dotenv').config();
 const {logMessage} = require('../../functions/utilities/core/loggingUtils');
+const guildModel = require('../../models/guildModel');
+const userModel = require('../../models/userModel');
+const {EmbedBuilder} = require("discord.js");
 logMessage(`Hello, world! From handleCommands.js`, `INFO`);
+
+async function createUserIfNotFound(interaction) {
+    const userModel = require('../../models/userModel');
+
+    try {
+        await userModel.create({
+            userID: interaction.user.id,
+            guildID: interaction.guild.id
+        });
+    } catch (error) {
+        logMessage(`Error creating user: ${error.stack}`, 'ERROR');
+        return interaction.reply({ content: 'Whoops! Something went wrong.', ephemeral: true });
+    }
+}
+
+async function createGuildIfNotFound(interaction) {
+    const guildModel = require('../../models/guildModel');
+
+    try {
+        await guildModel.create({
+            guildID: interaction.guild.id,
+            welcomeChannel: interaction.guild.systemChannelId,
+            welcomeMessage: 'Welcome to the server, {{user}}!',
+            leaveChannel: interaction.guild.systemChannelId,
+            leaveMessage: '{{user}} has left the server.'
+        });
+    } catch (error) {
+        logMessage(`Error creating guild: ${error.stack}`, 'ERROR');
+        return interaction.reply({ content: 'Whoops! Something went wrong.', ephemeral: true });
+    }
+}
 
 module.exports = {
     name: 'interactionCreate',
     async execute(client, interaction) {
+        logMessage('Interaction received', 'INFO');
 
-        logMessage(`Interaction received`, `INFO`);
-
-        // Check if the user is a bot
-        console.log(interaction)
         if (interaction.user.bot) return;
 
         if (interaction.isModalSubmit()) {
-
             const id = interaction.customId;
 
-            if (id.startsWith('run-code_')) {
-                const language = id.split('_')[1];
-                const code = interaction.fields.getTextInputValue(`run-code-input`)
-                const output = await runCode(language, code);
+            if (!id.startsWith('run-code_')) return;
 
-                const embed = new EmbedBuilder()
-                    .setAuthor({name: `Made possible by Piston`, url: `https://github.com/engineer-man/piston`})
-                    .setTitle(`${output.language} ${output.version} | Your code`)
-                    .setDescription(`\`\`\`js\n${code}\`\`\``)
-                    .setColor('#00ff00')
+            const language = id.split('_')[1];
+            const code = interaction.fields.getTextInputValue('run-code-input');
+            const output = await runCode(language, code);
 
-                const outputEmbed = new EmbedBuilder()
-                    .setTitle(`Output`)
-                    .setDescription(`\`\`\`${output.run.output}\`\`\``)
-                    .setColor('#00ff00')
+            const embed = new EmbedBuilder()
+                .setAuthor({name: 'Made possible by Piston', url: 'https://github.com/engineer-man/piston'})
+                .setTitle(`${output.language} ${output.version} | Your code`)
+                .setDescription(`\`\`\`js\n${code}\`\`\``)
+                .setColor('#00ff00');
 
-                if (output.run.output === '') outputEmbed.setDescription(`\`\`\`No output\`\`\``)
+            const outputEmbed = new EmbedBuilder()
+                .setTitle('Output')
+                .setDescription(output.run.output || 'No output')
+                .setColor('#00ff00');
 
-                await interaction.reply({embeds: [embed, outputEmbed], ephemeral: false});
+            await interaction.reply({embeds: [embed, outputEmbed], ephemeral: false});
+        } else if (interaction.isCommand()) {
+            logMessage('Command interaction received', 'INFO');
 
-            }
-        }
-        else if (interaction.isCommand()) {
-
-            logMessage(`Command interaction received`, `INFO`);
-
-            // Check if both the user and guild are in the database
-            const userModel = require(`../../models/userModel`);
-            const guildModel = require(`../../models/guildModel`);
-
-            async function createUser() {
-                logMessage(`User ${interaction.user.id} not found in database.`, `WARNING`);
-                try {
-                    const newUser = await new userModel({
-                        userID: interaction.user.id,
-                        guildID: interaction.guild.id
-                    });
-                    await newUser.save();
-                } catch (error) {
-                    logMessage(`Error creating user ${interaction.user.id}: ${error.stack}`, `ERROR`);
-                    await interaction.reply({
-                        content: 'Whoops! Something went wrong. The user could not be created.',
-                        ephemeral: true
-                    });
-                }
-
-            }
-
-            async function createGuild() {
-                logMessage(`Guild ${interaction.guild.id} not found in database.`, `WARNING`);
-                try {
-                    const newGuild = await new guildModel({
-                        guildID: interaction.guild.id,
-                        welcomeChannel: interaction.guild.systemChannelId,
-                        welcomeMessage: `Welcome to the server, {{user}}!`,
-                        leaveChannel: interaction.guild.systemChannelId,
-                        leaveMessage: `{{user}} has left the server.`
-                    });
-                    await newGuild.save();
-                } catch (error) {
-                    logMessage(`Error creating guild ${interaction.guild.id}: ${error.stack}`, `ERROR`);
-                    await interaction.reply({
-                        content: 'Whoops! Something went wrong. The guild could not be created.',
-                        ephemeral: true
-                    });
-                }
-            }
-
-            // Check if the guild is in the database
             const guild = await guildModel.findOne({guildID: interaction.guild.id});
-            if (guild === null) await createGuild();
+            if (!guild) await createGuildIfNotFound(interaction);
 
-            // Check if the user is in the database
             const user = await userModel.findOne({userID: interaction.user.id, guildID: interaction.guild.id});
-            if (user === null) await createUser();
+            if (!user) await createUserIfNotFound(interaction);
 
             const command = client.commands.get(interaction.commandName);
             if (!command) return interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
 
             try {
-                logMessage(`Running command ${command.data.name}`, `INFO`);
+                logMessage(`Running command ${command.data.name}`, 'INFO');
                 await command.execute(interaction, client);
             } catch (error) {
-                logMessage(`Error running command ${command.data.name}: ${error.stack}`, `ERROR`);
+                logMessage(`Error running command ${command.data.name}: ${error.stack}`, 'ERROR');
                 await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
             }
-
         }
     }
+
 }
