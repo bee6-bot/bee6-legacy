@@ -1,4 +1,4 @@
-const {SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require('discord.js');
+const {SlashCommandBuilder} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
 const userModel = require('../../models/userModel');
 const {writeFile} = require("fs");

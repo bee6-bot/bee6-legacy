@@ -16,17 +16,17 @@ console.log()
 
 // 1.4: Database
 const mongoose = require('mongoose')
-const Models = {
-    User: require('./models/userModel.js'),
-    Guild: require('./models/guildModel.js'),
-    Poll: require('./models/pollModel.js'),
-    customCommand: require('./models/customCommandModel.js'),
-    moderation: require('./models/moderationModel.js'),
-    economyTransaction: require('./models/economyTransactionModel.js'),
-    reactionRole: require('./models/reactionRoleModel.js'),
-    logging: require('./models/loggingModel.js'),
-    reminder: require('./models/reminderModel.js') // accounts for birthdays as well as other reminders
-}
+// const Models = {
+//     User: require('./models/userModel.js'),
+//     Guild: require('./models/guildModel.js'),
+//     Poll: require('./models/pollModel.js'),
+//     customCommand: require('./models/customCommandModel.js'),
+//     moderation: require('./models/moderationModel.js'),
+//     economyTransaction: require('./models/economyTransactionModel.js'),
+//     reactionRole: require('./models/reactionRoleModel.js'),
+//     logging: require('./models/loggingModel.js'),
+//     reminder: require('./models/reminderModel.js') // accounts for birthdays as well as other reminders
+// }
 
 // 1.5: Functions
 // const {replyWithEmbed} = require('./functions/helpers/embedResponse.js')
@@ -35,7 +35,6 @@ const Models = {
 
 // 1.6: Debugging
 let debug = process.env.DEBUG === 'true'
-let debugGuild = process.env.DEBUG_GUILD
 
 // 1.7: Client
 const client = new Client({

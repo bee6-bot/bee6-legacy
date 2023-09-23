@@ -123,9 +123,7 @@ module.exports = {
         });
 
         async function isLoggingChannel(channelID) {
-            for (const channelID of Object.values(channelIDs)) {
-                if (message.channel.id === channelID) return true;
-            }
+            for (const channel in channelIDs) if (channelIDs[channel] === channelID) return true;
             return false;
         }
 

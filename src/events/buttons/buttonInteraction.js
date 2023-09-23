@@ -28,8 +28,7 @@ module.exports = {
 
                 let leaderboardString = ``;
                 for (let i = 0; i < leaderboard.length; i++) {
-                    const {userID, level, xp, totalXP} = leaderboard[i];
-                    const xpNeeded = calculateXPUntilLevel(level, xp);
+                    const {userID, level, xp} = leaderboard[i];
                     leaderboardString += `${i + 1}. **${i === 0 ? `:trophy: ` : ``}<@${userID}>** - Level ${level} (${xp} XP)\n`;
                 }
 

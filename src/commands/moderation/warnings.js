@@ -1,6 +1,5 @@
 const {SlashCommandBuilder, PermissionFlagsBits} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
-const userModel = require('../../models/userModel');
 const moderationModel = require('../../models/moderationModel');
 
 module.exports = {

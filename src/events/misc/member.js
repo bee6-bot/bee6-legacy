@@ -1,7 +1,5 @@
-const guildModel = require("../../models/guildModel");
-const userModel = require("../../models/userModel");
 const {EmbedBuilder} = require("discord.js");
-const {getResponsibleUser, getLogChannel} = require("../../functions/utilities/otherUtils");
+const {getLogChannel} = require("../../functions/utilities/otherUtils");
 const {sendWelcomeLeaveMessage} = require("../../functions/utilities/memberEventUtility");
 
 /**

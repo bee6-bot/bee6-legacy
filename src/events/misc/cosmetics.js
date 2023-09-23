@@ -1,4 +1,3 @@
-const guildModel = require("../../models/guildModel");
 const {EmbedBuilder} = require("discord.js");
 const {getResponsibleUser, getLogChannel} = require("../../functions/utilities/otherUtils");
 
