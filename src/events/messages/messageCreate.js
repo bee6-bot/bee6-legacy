@@ -17,8 +17,8 @@ module.exports = {
         const bcrypt = require('bcrypt');
         // If the message contains "mee6"
         if (message.content.toLowerCase().includes('mee6')) {
-            message.react('🤓');
-            message.react('🛡️');
+            await message.react('🤓');
+            await message.react('🛡️');
         }
 
 
