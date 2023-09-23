@@ -1,7 +1,7 @@
 // handleEvents.js
 // For things like message created etc
 
-const {logMessage} = require('../utilities/loggingUtils');
+const {logMessage} = require('../utilities/core/loggingUtils');
 logMessage(`Hello, world! From handleEvents.js`, `INFO`);
 
 const { readdirSync } = require('fs');

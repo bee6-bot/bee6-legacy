@@ -1,4 +1,4 @@
-const {logMessage} = require('../../functions/utilities/loggingUtils');
+const {logMessage} = require('../../functions/utilities/core/loggingUtils');
 
 require('dotenv').config();
 const {AI_ENABLED, AI_URL, FLUENT_AI} = process.env;

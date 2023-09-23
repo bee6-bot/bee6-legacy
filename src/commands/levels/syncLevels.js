@@ -1,5 +1,5 @@
 const {SlashCommandBuilder, PermissionsBitField} = require('discord.js');
-const {logMessage} = require('../../functions/utilities/loggingUtils');
+const {logMessage} = require('../../functions/utilities/core/loggingUtils');
 logMessage(`Hello, world! From syncLevels.js`, `INFO`);
 const UserModel = require('../../models/userModel');
 const guildModel = require('../../models/guildModel');

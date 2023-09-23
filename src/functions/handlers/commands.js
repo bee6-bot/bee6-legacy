@@ -1,5 +1,5 @@
 require('dotenv').config();
-const {logMessage} = require('../utilities/loggingUtils');
+const {logMessage} = require('../utilities/core/loggingUtils');
 logMessage(`Hello, world! From handleCommands.js`, `INFO`);
 
 const {REST, Routes, EmbedBuilder} = require('discord.js');
@@ -31,7 +31,8 @@ async function registerSlashCommands(client, commands) {
  * @name handleCommandInteractions
  * @type {module}
  * @description Handle command interactions and register slash commands
- * @param {Object} client Discord client
+ * @param language
+ * @param code
  */
 
 async function runCode(language, code) {

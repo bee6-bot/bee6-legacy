@@ -1,5 +1,5 @@
 const Guild = require('../../models/guildModel');
-const {logMessage} = require("./loggingUtils");
+const {logMessage} = require("./core/loggingUtils");
 const {workCooldowns, robCooldowns, gambleCooldowns} = { workCooldowns: {}, robCooldowns: {}, gambleCooldowns: {} }
 
 /**

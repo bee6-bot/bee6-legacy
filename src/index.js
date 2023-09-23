@@ -4,16 +4,15 @@
 
 // 1.1: Config files and environment variables
 require('dotenv').config()
-const envSetup = require('./functions/utilities/envSetup.js');
+const envSetup = require('./functions/utilities/core/envSetup.js');
 
 // 1.2: Discord.js
 const {Client, GatewayIntentBits, Collection} = require('discord.js')
 
 // 1.3: Misc.
 const process = require(`node:process`)
-const {logMessage} = require('./functions/utilities/loggingUtils.js')
+const {logMessage} = require('./functions/utilities/core/loggingUtils.js')
 console.log()
-logMessage(`Hello, world! From index.js`, `INFO`)
 
 // 1.4: Database
 const mongoose = require('mongoose')

@@ -1,6 +1,6 @@
 // Unused - replaced by src/events/buttons/buttonInteraction.js
 
-const {logMessage} = require('../utilities/loggingUtils');
+const {logMessage} = require('../utilities/core/loggingUtils');
 logMessage(`Hello, world! From handleButtons.js`, `INFO`);
 
 /**
