@@ -33,7 +33,7 @@ function writeToFile(logText, logFileName) {
 /**
  * Logs messages with timestamp to the console and writes them to a log file.
  * @param {string} message - The log message to be displayed.
- * @param {("ERROR"|"WARNING"|"INFO")} [logLevel=INFO] - The log level. Possible values: "ERROR", "WARNING", "INFO".
+ * @param {("ERROR"|"WARNING"|"INFO"|"SUCCESS")} [logLevel=INFO] - The log level. Possible values: "ERROR", "WARNING", "INFO".
  */
 function logMessage(message, logLevel = 'INFO') {
     const timestamp = new Date().toISOString();
@@ -46,6 +46,9 @@ function logMessage(message, logLevel = 'INFO') {
             break;
         case 'WARNING':
             console.warn(chalk.yellow(formattedMessage));
+            break;
+        case 'SUCCESS':
+            console.log(chalk.green(formattedMessage));
             break;
         case 'INFO':
             console.log(chalk.blue(formattedMessage));
