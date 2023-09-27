@@ -22,7 +22,7 @@ const guildSchema = new mongoose.Schema({
 
     // Cooldowns
     workCooldown: {type: Number, default: 180000}, // 3 minutes
-    TrobCooldown: {type: Number, default: 300000}, // 5 minute
+    robCooldown: {type: Number, default: 300000}, // 5 minute
     gambleCooldown: {type: Number, default: 300000}, // 5 minutes
 
     // XP
@@ -40,14 +40,20 @@ const guildSchema = new mongoose.Schema({
     // Welcome
     welcome: {type: Boolean, default: false},
     welcomeChannelID: {type: String, default: ''},
-    welcomeMessage: {type: String, default: ''},
+    welcomeMessage: {
+        type: String,
+        default: 'Hey, {{user}}! Welcome to **{{guild}}**! You are the **{{memberCount}}th** member!'
+    },
     welcomeEmbed: {type: Boolean, default: false},
     welcomeImage: {type: String, default: ''},
 
     // Leave
     leave: {type: Boolean, default: false},
     leaveChannelID: {type: String, default: ''},
-    leaveMessage: {type: String, default: ''},
+    leaveMessage: {
+        type: String,
+        default: `Oh no, **{{user}}** left {{guild}! We're down to **{{memberCount}}** members!`
+    },
     leaveEmbed: {type: Boolean, default: false},
     leaveImage: {type: String, default: ''},
 

@@ -13,7 +13,7 @@ module.exports = {
         await sendEmbed(
             interaction,
             EmbedType.INFO,
-            `Balance`,
+            `${user.username}'s Balance`,
             `**:pound: Cash:** ${formatMoney(cash)}\n**:bank: Bank:** ${formatMoney(bank)}`,
             false
         );

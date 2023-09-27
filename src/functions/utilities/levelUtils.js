@@ -8,7 +8,7 @@
 // 1. Imports
 // ===============================================
 
-const {logMessage} = require('./loggingUtils');
+const {logMessage} = require('./core/loggingUtils');
 const {Snowflake} = require('discord.js');
 logMessage(`Hello, world! From leveling.js`, `INFO`);
 const userModel = require('../../models/userModel');

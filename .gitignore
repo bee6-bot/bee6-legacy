@@ -1,3 +1,7 @@
+# Project specific ignores
+context.txt
+*.log
+
 ### MonoDevelop template
 #User Specific
 *.userprefs
@@ -108,7 +112,6 @@ local.properties
 ### Node template
 # Logs
 logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

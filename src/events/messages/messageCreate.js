@@ -1,16 +1,12 @@
-const {logMessage} = require('../../functions/utilities/loggingUtils');
+const {logMessage} = require('../../functions/utilities/core/loggingUtils');
 
 require('dotenv').config();
-const bcrypt = require('bcrypt');
 const {AI_ENABLED, AI_URL, FLUENT_AI} = process.env;
 const {addXP} = require('../../functions/utilities/levelUtils');
 const {Snowflake, EmbedBuilder} = require('discord.js');
 const {checkUser} = require('../../functions/utilities/makerSurerExister');
 const User = require('../../models/userModel');
 const fs = require('fs');
-const {levenshteinDistance} = require('../../functions/utilities/comparisonUtils');
-const {getLevelData} = require('../../functions/utilities/levelUtils');
-const guildModel = require("../../models/guildModel");
 
 const cooldowns = {'xp': { /* userID, guildID, timestamp */}}
 let lastAIResponseTime = 0;
@@ -18,11 +14,11 @@ let lastAIResponseTime = 0;
 module.exports = {
     name: 'messageCreate',
     async execute(client, message) {
-
+        const bcrypt = require('bcrypt');
         // If the message contains "mee6"
         if (message.content.toLowerCase().includes('mee6')) {
-            message.react('🤓');
-            message.react('🛡️');
+            await message.react('🤓');
+            await message.react('🛡️');
         }
 
 
@@ -105,14 +101,21 @@ module.exports = {
             if (message.attachments.size > 0) {
                 content += '\n**Attachments:** ';
                 let attachmentNumber = 1;
-                // [attachment #1](url) [attachment #2](url)
                 message.attachments.forEach(attachment => {
                     content += `[Attachment #${attachmentNumber}](${attachment.url}) `;
                     attachmentNumber++;
                 });
             }
 
-            await clChannel.send({content: content});
+            // If the message is a reply
+            if (message.reference) {
+                const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
+                content = `- **Replying to:** https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.reference.messageId} | ` +
+                    `**${referencedMessage.author.username}** (${referencedMessage.author.id}) | ` +
+                    `${referencedMessage.content}\n - ` + content;
+            }
+
+            await clChannel.send({embeds: [new EmbedBuilder().setDescription(content)]});
         }
 
         continuousLogging(message).then(() => {
@@ -120,9 +123,7 @@ module.exports = {
         });
 
         async function isLoggingChannel(channelID) {
-            for (const channelID of Object.values(channelIDs)) {
-                if (message.channel.id === channelID) return true;
-            }
+            for (const channel in channelIDs) if (channelIDs[channel] === channelID) return true;
             return false;
         }
 
@@ -130,19 +131,37 @@ module.exports = {
          * @name aiReply
          * @description Reply to a message using the AI
          * @param {string} message Message
+         * @param {string} replyTo Message to reply to
          * @param {string} context Context
-         * @returns {Promise<void>}
+         * @param {number} version Version
+         * @returns {Promise<{text: string}>}
          */
 
-        async function aiReply(message, context = "") {
+        async function aiReply(message, replyTo = "", context = "", version = 3) {
+
             // Uses https://github.com/BeauTheBeau/ai-api
-            const response = await fetch(`${AI_URL}/generate/v2/?prompt=${encodeURIComponent(message)}`);
-            return await response.json();
+            const start = Date.now();
+            let url = `${AI_URL}/generate/v${version.toString()}/`
+            let args = `?prompt=${encodeURIComponent(message)}`;
+            if (version === 3 && replyTo !== "") {
+                url += "conversation/";
+                args += `&preprompt=${encodeURIComponent(replyTo)}&context=${encodeURIComponent(context)}`;
+            } else if (version === 3 && replyTo === "") {
+                if (context !== "") args += `&context=${encodeURIComponent(context)}`;
+            } else if (version === 2) {
+                args += `&context=${encodeURIComponent(context)}`;
+            } else {
+                return {text: "Invalid version"};
+            }
+
+            let response = await fetch(url + args)
+            response = await response.json();
+            console.log(response)
+            return {text: response.text, time: Date.now() - start};
         }
 
-        const author = message.author;
-
         if (await isLoggingChannel(message.channel.id)) return;
+        if (message.channel.id === "1146117922310344864") return;
         if (message.mentions.has(client.user.id) || message.content.toLowerCase().includes('bee6')) {
 
             if (message.content.toLowerCase().includes('bee6') && message.author.id === client.user.id) return;
@@ -153,11 +172,33 @@ module.exports = {
             prompt = `${prompt}`;
 
             await message.channel.sendTyping()
-            const response = await aiReply(prompt);
+            let context = fs.readFileSync('./context.txt', 'utf8');
+            context = context
+                .replace(`[Server Name]`, message.guild.name)
+                .replace(`[Server Owner]`, null)
+                .replace(`[Channel Name]`, message.channel.name)
+                .replace(`[Channel List]`, message.guild.channels.cache.map(channel => `${channel.name} (${channel.parent ? channel.parent.name : 'No Category'})`).join(', '))
+                .replace(`[Member List]`, message.guild.members.cache.map(member => member.user.username).join(', '))
+                .replace(`[User]`, message.author.username)
+                .replace(`[Roles]`, message.guild.roles.cache.map(role => role.name).join(', '))
+                .replace(`[Date]`, message.member.joinedAt)
+                .replace(`[Time]`, new Date().toLocaleTimeString());
 
-            // Check if the last message in the channel isn't from the author
+            let response;
+            let version = 3;
+            if (message.author.bot) version = 2;
+            else version = 3;
+
+            if (message.reference) {
+                const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
+                response = await aiReply(prompt, referencedMessage.content, context, version);
+            }
+
+            if (!response) response = await aiReply(prompt, "", context, version);
+            console.log(response)
+
             await message.reply({
-                content: `${response.text}`,
+                content: `\`V${version}\` \`Took at least 0.0001ms\` ${response.text}`,
                 allowedMentions: {repliedUser: true}
             });
 
@@ -171,11 +212,10 @@ module.exports = {
 
             // Send the AI response
             await message.channel.send({
-                content: `${response.text}`
+                content: `\`V2\` ${response.text}`
             });
 
-            lastAIResponseTime = Date.now(); // Update the last AI response time
+            lastAIResponseTime = Date.now();
         }
     }
-
 }

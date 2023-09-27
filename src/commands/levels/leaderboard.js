@@ -1,5 +1,5 @@
 const {SlashCommandBuilder, ActionRowBuilder, ButtonBuilder} = require('discord.js');
-const {logMessage} = require('../../functions/utilities/loggingUtils');
+const {logMessage} = require('../../functions/utilities/core/loggingUtils');
 logMessage(`Hello, world! From leaderboard.js`, `INFO`);
 
 const {getLeaderboard, calculateXPUntilLevel} = require('../../functions/utilities/levelUtils');

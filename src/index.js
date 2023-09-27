@@ -4,30 +4,29 @@
 
 // 1.1: Config files and environment variables
 require('dotenv').config()
-const envSetup = require('./functions/utilities/envSetup.js');
+const envSetup = require('./functions/utilities/core/envSetup.js');
 
 // 1.2: Discord.js
 const {Client, GatewayIntentBits, Collection} = require('discord.js')
 
 // 1.3: Misc.
 const process = require(`node:process`)
-const {logMessage} = require('./functions/utilities/loggingUtils.js')
+const {logMessage} = require('./functions/utilities/core/loggingUtils.js')
 console.log()
-logMessage(`Hello, world! From index.js`, `INFO`)
 
 // 1.4: Database
 const mongoose = require('mongoose')
-const Models = {
-    User: require('./models/userModel.js'),
-    Guild: require('./models/guildModel.js'),
-    Poll: require('./models/pollModel.js'),
-    customCommand: require('./models/customCommandModel.js'),
-    moderation: require('./models/moderationModel.js'),
-    economyTransaction: require('./models/economyTransactionModel.js'),
-    reactionRole: require('./models/reactionRoleModel.js'),
-    logging: require('./models/loggingModel.js'),
-    reminder: require('./models/reminderModel.js') // accounts for birthdays as well as other reminders
-}
+// const Models = {
+//     User: require('./models/userModel.js'),
+//     Guild: require('./models/guildModel.js'),
+//     Poll: require('./models/pollModel.js'),
+//     customCommand: require('./models/customCommandModel.js'),
+//     moderation: require('./models/moderationModel.js'),
+//     economyTransaction: require('./models/economyTransactionModel.js'),
+//     reactionRole: require('./models/reactionRoleModel.js'),
+//     logging: require('./models/loggingModel.js'),
+//     reminder: require('./models/reminderModel.js') // accounts for birthdays as well as other reminders
+// }
 
 // 1.5: Functions
 // const {replyWithEmbed} = require('./functions/helpers/embedResponse.js')
@@ -36,7 +35,6 @@ const Models = {
 
 // 1.6: Debugging
 let debug = process.env.DEBUG === 'true'
-let debugGuild = process.env.DEBUG_GUILD
 
 // 1.7: Client
 const client = new Client({
@@ -56,15 +54,55 @@ client.buttonArray = []
 logMessage(`Readying up...`, `INFO`)
 logMessage(`Debug mode: ${debug}`, `INFO`)
 
+// 2.05 Check if there is a new commit
+
+async function checkForUpdates() {
+    logMessage(`Checking for updates...`, `INFO`)
+    // Get the current commit hash
+    const currentCommit = require('child_process').execSync('git rev-parse HEAD').toString().trim();
+    const currentCommitMessage = require('child_process').execSync('git log -1 --pretty=%B').toString().trim();
+
+    // Get the last commit hash
+    const lastCommit = require('child_process').execSync('git rev-parse HEAD@{1}').toString().trim();
+    const lastCommitMessage = require('child_process').execSync('git log -1 --pretty=%B HEAD@{1}').toString().trim();
+
+    // Check the date of the last commit and the current commit
+    const lastCommitDate = require('child_process').execSync('git show -s --format=%ci HEAD@{1}').toString().trim();
+    const currentCommitDate = require('child_process').execSync('git show -s --format=%ci HEAD').toString().trim();
+
+    // If the last commit is older than the current commit, there is a new commit
+    if (lastCommitDate > currentCommitDate) {
+
+        const readInputFromConsole = require('./functions/utilities/core/inputUtils.js')
+
+        console.log()
+        logMessage(`New commit found!`, `INFO`)
+        logMessage(`Last commit: ${lastCommit} ${lastCommitMessage}`, `INFO`)
+        logMessage(`Current commit: ${currentCommit} ${currentCommitMessage}`, `INFO`)
+        const input = await readInputFromConsole(`Would you like to update? (y/N) `)
+        if (input.toLowerCase() === 'y') {
+            logMessage(`Updating...`, `INFO`)
+            require('child_process').execSync('git pull').toString().trim();
+            logMessage(`Updated!`, `INFO`)
+            process.exit(0)
+        } else {
+            logMessage(`Not updating.`, `INFO`)
+        }
+    }
+
+}
+
+
 // 2.1: Command and button handlers
 async function initializeHandlers() {
     logMessage(`Initializing command handlers...`, `INFO`)
     await require('./functions/handlers/commands.js')(client)
-    // require('./functions/handlers/handleButtons.js')(client)
-    logMessage(`Command handlers initialized!`, `INFO`)
 
+    logMessage(`Initializing event handlers...`, `INFO`)
     await require('./functions/handlers/events.js')(client)
 
+    logMessage(`Initializing button handlers...`, `INFO`)
+    await require('./functions/handlers/buttons.js')(client)
 }
 
 // 2.1: Initialize client
@@ -74,6 +112,10 @@ async function initializeClient() {
         await client.login(process.env.TOKEN);
         logMessage(`Client initialized!`, `INFO`);
         logMessage(`Logged in as ${client.user.tag}!`, `INFO`);
+
+        // Check for updates
+        await checkForUpdates()
+
         await initializeHandlers();
     } catch (err) {
         logMessage(`Error logging in: ${err.stack}`, `ERROR`)

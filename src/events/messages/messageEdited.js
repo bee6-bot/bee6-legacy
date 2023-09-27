@@ -1,14 +1,18 @@
-const guildModel = require("../../models/guildModel");
+const {EmbedBuilder} = require("discord.js");
 
 module.exports = {
     name: 'messageUpdate',
     async execute(client, newMessage, oldMessage) {
 
+        const guildModel = require("../../models/guildModel");
+        if (newMessage.content === oldMessage.content) return;
+        if (newMessage.author.bot) return;
+
         let content = `**\`EDITED\`** | ` +
             `https://discord.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id} | ` +
             `**${newMessage.author.tag}** (${newMessage.author.id})` +
-            `\n**Before:** \`${newMessage.content}\` | ` +
-            `\n**After:** \`${oldMessage.content}\``;
+            `\n**Before:** ${newMessage.content} | ` +
+            `\n**After:** ${oldMessage.content}`;
 
         if (newMessage.attachments.size > 0) {
             content += '\n**Attachments:** ';
@@ -25,7 +29,7 @@ module.exports = {
 
         if (!logChannel) return;
 
-        await logChannel.send({content: content});
+        await logChannel.send({embeds: [new EmbedBuilder().setDescription(content)]});
 
     }
 }

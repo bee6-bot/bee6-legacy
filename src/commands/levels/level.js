@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {logMessage} = require('../../functions/utilities/loggingUtils');
+const {logMessage} = require('../../functions/utilities/core/loggingUtils');
 logMessage(`Hello, world! From level.js`, `INFO`);
 
 const {getLevelData} = require('../../functions/utilities/levelUtils');

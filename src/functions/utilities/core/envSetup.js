@@ -1,9 +1,8 @@
 require(`dotenv`).config()
 const fs = require(`fs`)
-const readFromConsole = require(`../../functions/utilities/inputUtils.js`)
+const readFromConsole = require(`./inputUtils.js`)
 
 const {logMessage} = require('./loggingUtils.js')
-logMessage(`Hello, world! From envSetup.js`, `INFO`)
 
 /**
  * @name envSetup
