@@ -1,9 +1,10 @@
 const {SlashCommandBuilder, ButtonBuilder, ActionRowBuilder} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
+require('dotenv').config();
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('bee6')
+        .setName(process.env.BOT_NAME.toLowerCase())
         .setDescription('Replies with bot latency and other stats.'),
     async execute(interaction) {
 

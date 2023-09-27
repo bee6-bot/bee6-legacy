@@ -1,6 +1,8 @@
-// buttonInteraction
+// REMOVED TEMPORARILY TO STOP MEMORY LEAKS.
+// THIS FILE IS REDUNDANT ANYWAY.
+// WHO PUT THIS HERE????
 
-const {sendEmbed, EmbedType} = require("../../functions/utilities/embedUtils");
+Move slash commands to a new fileconst {sendEmbed, EmbedType} = require("../../functions/utilities/embedUtils");
 const {ActionRowBuilder, ButtonBuilder} = require("discord.js");
 
 module.exports = {
