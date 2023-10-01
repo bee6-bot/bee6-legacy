@@ -3,7 +3,6 @@ const {logMessage} = require('../../functions/utilities/core/loggingUtils');
 const guildModel = require('../../models/guildModel');
 const userModel = require('../../models/userModel');
 const {EmbedBuilder} = require("discord.js");
-logMessage(`Hello, world! From handleCommands.js`, `INFO`);
 
 async function createUserIfNotFound(interaction) {
     const userModel = require('../../models/userModel');
@@ -65,7 +64,8 @@ module.exports = {
                 .setColor('#00ff00');
 
             await interaction.reply({embeds: [embed, outputEmbed], ephemeral: false});
-        } else if (interaction.isCommand()) {
+        }
+        else if (interaction.isCommand()) {
             logMessage('Command interaction received', 'INFO');
 
             const guild = await guildModel.findOne({guildID: interaction.guild.id});
@@ -84,16 +84,14 @@ module.exports = {
                 logMessage(`Error running command ${command.data.name}: ${error.stack}`, 'ERROR');
                 await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
             }
-        } else if (interaction.isAutocomplete()) {
-            logMessage('Autocomplete interaction received', 'INFO');
+        }
+        else if (interaction.isAutocomplete()) {
             const command = client.commands.get(interaction.commandName);
             if (!command) return interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
 
             try {
-                logMessage(`Running autocomplete for ${command.data.name}`, 'INFO');
                 await command.autocomplete(interaction, client);
             } catch (error) {
-                logMessage(`Error running autocomplete for ${command.data.name}: ${error.stack}`, 'ERROR');
                 await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
             }
         }
