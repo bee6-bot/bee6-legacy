@@ -75,10 +75,5 @@ module.exports = async (client) => {
 
     await registerSlashCommands(client, client.commands.map(command => command.data.toJSON()));
     logMessage(`Registered slash commands`, `INFO`);
-
-    // if (eventListenerRegistered) return;
-    client.on('interactionCreate', async interaction => {
-
-    });
 }
 
