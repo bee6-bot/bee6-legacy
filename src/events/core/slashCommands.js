@@ -52,6 +52,7 @@ module.exports = {
             const code = interaction.fields.getTextInputValue('run-code-input');
             const output = await runCode(language, code);
 
+            // noinspection JSCheckFunctionSignatures
             const embed = new EmbedBuilder()
                 .setAuthor({name: 'Made possible by Piston', url: 'https://github.com/engineer-man/piston'})
                 .setTitle(`${output.language} ${output.version} | Your code`)
@@ -83,7 +84,18 @@ module.exports = {
                 logMessage(`Error running command ${command.data.name}: ${error.stack}`, 'ERROR');
                 await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
             }
+        } else if (interaction.isAutocomplete()) {
+            logMessage('Autocomplete interaction received', 'INFO');
+            const command = client.commands.get(interaction.commandName);
+            if (!command) return interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
+
+            try {
+                logMessage(`Running autocomplete for ${command.data.name}`, 'INFO');
+                await command.autocomplete(interaction, client);
+            } catch (error) {
+                logMessage(`Error running autocomplete for ${command.data.name}: ${error.stack}`, 'ERROR');
+                await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
+            }
         }
     }
-
 }
