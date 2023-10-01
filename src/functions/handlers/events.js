@@ -17,9 +17,9 @@ module.exports = async (client) => {
 
             if (Array.isArray(eventArray)) {
                 for (const eventObj of eventArray) {
-                    client.on(eventObj.name, eventObj.execute.bind(null, client));
+                    client.once(eventObj.name, eventObj.execute.bind(null, client));
                 }
-            } else client.on(eventArray.name, eventArray.execute.bind(null, client)); // Handle when a single event object is exported
+            } else client.once(eventArray.name, eventArray.execute.bind(null, client)); // Handle when a single event object is exported
         }
     }
 }

@@ -6,12 +6,14 @@
 require('dotenv').config()
 const envSetup = require('./functions/utilities/core/envSetup.js');
 
-// 1.2: Discord.js
+// 1.2: Discord.js + other main deps
 const {Client, GatewayIntentBits, Collection} = require('discord.js')
 
 // 1.3: Misc.
 const process = require(`node:process`)
 const {logMessage} = require('./functions/utilities/core/loggingUtils.js')
+const fs = require('fs');
+const path = require('path');
 console.log()
 
 // 1.4: Database
@@ -36,10 +38,13 @@ const mongoose = require('mongoose')
 // 1.6: Debugging
 let debug = process.env.DEBUG === 'true'
 
-// 1.7: Client
+// 1.7: Client & API
 const client = new Client({
     intents: Object.values(GatewayIntentBits).reduce((a, b) => a | b, 0),
 })
+
+const { startApiServer } = require('./api');
+
 
 // 1.8: Handlers
 client.commands = new Collection()
@@ -110,8 +115,8 @@ async function initializeClient() {
     logMessage(`Initializing client...`, `INFO`)
     try {
         await client.login(process.env.TOKEN);
-        logMessage(`Client initialized!`, `INFO`);
-        logMessage(`Logged in as ${client.user.tag}!`, `INFO`);
+        logMessage(`Client initialized!`, `SUCCESS`);
+        logMessage(`Logged in as ${client.user.tag}!`, `SUCCESS`);
 
         // Check for updates
         await checkForUpdates()
@@ -170,17 +175,18 @@ async function connectToDatabase() {
 envSetup().then(() => {
     connectToDatabase()
         .then(() => {
-            logMessage(`Database initialized!`, `INFO`)
+            logMessage(`Database initialized!`, `SUCCESS`);
             initializeClient().then(() => {
-                logMessage(`Initialization complete!`, `INFO`)
-                logMessage(`Ready to go!`, `INFO`)
+                logMessage(`Ready to go!`, `SUCCESS`)
+                startApiServer(); // Start the API server
             })
         })
         .catch((err) => {
             logMessage(`Error initializing database: ${err.stack}`, `ERROR`)
             process.exit(1)
         });
-})
+});
+
 
 // ===============================================
 // 3. Error handling
