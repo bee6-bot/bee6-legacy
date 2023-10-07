@@ -205,7 +205,24 @@ process.on('unhandledRejection', (err) => logMessage(err.stack, 'ERROR'));
 process.on('uncaughtException', (err) => logMessage(err.stack, 'ERROR'));
 
 // 3.3: Process exit
-process.on('exit', (code) => {
-    logMessage(`Process exited with code ${code}`, 'INFO');
-    mongoose.connection.close();
-});
+process.stdin.resume();
+let exited = false;
+function exitHandler(exitCode) {
+    if (exited) return;
+    exited = true;
+    console.log(`\n\n\n `)
+    logMessage(`Process exited with code ${exitCode}`, 'SUCCESS');
+    const logFiles = fs.readdirSync(path.join(__dirname, 'logs'));
+    const lastEditedLogFile = logFiles.reduce((prev, curr) => {
+        const prevStat = fs.statSync(path.join(__dirname, 'logs', prev));
+        const currStat = fs.statSync(path.join(__dirname, 'logs', curr));
+        return prevStat.mtimeMs > currStat.mtimeMs ? prev : curr;
+    });
+    logMessage(`View this session's logs at ${path.join(__dirname, 'logs', lastEditedLogFile)}`, 'INFO');
+    process.exit();
+}
+
+process.on('exit', exitHandler.bind(null));
+process.on('SIGINT', exitHandler.bind(null));
+process.on('SIGUSR1', exitHandler.bind(null));
+process.on('SIGUSR2', exitHandler.bind(null));
