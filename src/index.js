@@ -106,12 +106,14 @@ async function checkForUpdates() {
 
 // 2.1: Command and button handlers
 async function initializeHandlers() {
+    await require('./functions/handlers/commands.js')(client)
+
     // Temporarily removed event handlers as they seem to cause interactions to be delayed
-    // logMessage(`Initializing event handlers...`, `INFO`)
-    // await require('./functions/handlers/events.js')(client)
+    logMessage(`Initializing event handlers...`, `INFO`)
+    await require('./functions/handlers/events.js')(client)
 
     logMessage(`Initializing command handlers...`, `INFO`)
-    await require('./functions/handlers/commands.js')(client)
+
 }
 
 // 2.1: Initialize client
