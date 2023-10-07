@@ -4,8 +4,8 @@
 const {logMessage} = require('../utilities/core/loggingUtils');
 logMessage(`Hello, world! From handleEvents.js`, `INFO`);
 
-const { readdirSync } = require('fs');
-const { join } = require('path');
+const {readdirSync} = require('fs');
+const {join} = require('path');
 const eventDirs = readdirSync(join(__dirname, '../../events'));
 
 module.exports = async (client) => {
@@ -17,9 +17,14 @@ module.exports = async (client) => {
 
             if (Array.isArray(eventArray)) {
                 for (const eventObj of eventArray) {
+                    logMessage(`    Registered event ${eventObj.name}`, `INFO`);
                     client.once(eventObj.name, eventObj.execute.bind(null, client));
                 }
-            } else client.once(eventArray.name, eventArray.execute.bind(null, client)); // Handle when a single event object is exported
+            } else {
+                client.once(eventArray.name, eventArray.execute.bind(null, client)); // Handle when a single event object is exported}
+                logMessage(`    Registered event ${eventArray.name}`, `INFO`);
+            }
         }
+
     }
 }

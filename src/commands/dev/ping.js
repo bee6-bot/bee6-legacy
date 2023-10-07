@@ -28,8 +28,7 @@ module.exports = {
         const gitRemoteMin = gitRemote.replace(/.*github.com\//, '').replace(/\.git$/, '');
 
         await sendEmbed(
-            interaction,
-            EmbedType.INFO,
+            interaction, EmbedType.INFO,
             ':ping_pong: Pong!',
             `## Bot Stats\n`
             + `**Client Latency** is ${Date.now() - interaction.createdTimestamp}ms\n`
@@ -49,7 +48,7 @@ module.exports = {
             + `**Guilds:** ${interaction.client.guilds.cache.size}\n`
             + `**Users:** ${interaction.client.users.cache.size}\n`
             + `**Channels:** ${interaction.client.channels.cache.size}\n`,
-            false, [row]
+            true, [row]
         )
     }
 }

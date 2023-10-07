@@ -16,6 +16,11 @@ const fs = require('fs');
 const path = require('path');
 console.log()
 
+logMessage(`Running in ${process.env.NODE_ENV} mode.`, `INFO`)
+logMessage(`Node version: ${process.version}`, `INFO`)
+logMessage(`Discord.js version: ${require('discord.js').version}`, `INFO`)
+console.log()
+
 // 1.4: Database
 const mongoose = require('mongoose')
 // const Models = {
@@ -100,14 +105,12 @@ async function checkForUpdates() {
 
 // 2.1: Command and button handlers
 async function initializeHandlers() {
+    // Temporarily removed event handlers as they seem to cause interactions to be delayed
+    // logMessage(`Initializing event handlers...`, `INFO`)
+    // await require('./functions/handlers/events.js')(client)
+
     logMessage(`Initializing command handlers...`, `INFO`)
     await require('./functions/handlers/commands.js')(client)
-
-    logMessage(`Initializing event handlers...`, `INFO`)
-    await require('./functions/handlers/events.js')(client)
-
-    logMessage(`Initializing button handlers...`, `INFO`)
-    await require('./functions/handlers/buttons.js')(client)
 }
 
 // 2.1: Initialize client
