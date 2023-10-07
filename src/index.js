@@ -85,19 +85,20 @@ async function checkForUpdates() {
 
         const readInputFromConsole = require('./functions/utilities/core/inputUtils.js')
 
-        console.log()
-        logMessage(`New commit found!`, `INFO`)
-        logMessage(`Last commit: ${lastCommit} ${lastCommitMessage}`, `INFO`)
-        logMessage(`Current commit: ${currentCommit} ${currentCommitMessage}`, `INFO`)
-        const input = await readInputFromConsole(`Would you like to update? (y/N) `)
+        logMessage(`    New commit found!`, `INFO`)
+        logMessage(`    Last commit: ${lastCommit} ${lastCommitMessage}`, `INFO`)
+        logMessage(`    Current commit: ${currentCommit} ${currentCommitMessage}`, `INFO`)
+        const input = await readInputFromConsole(`    Would you like to update? (y/N) `)
         if (input.toLowerCase() === 'y') {
-            logMessage(`Updating...`, `INFO`)
+            logMessage(`    Updating...`, `INFO`)
             require('child_process').execSync('git pull').toString().trim();
-            logMessage(`Updated!`, `INFO`)
+            logMessage(`    Updated!`, `INFO`)
             process.exit(0)
         } else {
-            logMessage(`Not updating.`, `INFO`)
+            logMessage(`    Not updating.`, `INFO`)
         }
+    } else {
+        logMessage(`    No updates found, you're up to date!`, `INFO`)
     }
 
 }

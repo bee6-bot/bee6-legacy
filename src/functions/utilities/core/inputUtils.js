@@ -1,6 +1,11 @@
 
 const readline = require('readline');
 
+const chalk = require('chalk');
+
+let currentDate = new Date().toLocaleDateString().replace(/\//g, '-');
+let currentTime = new Date().toLocaleTimeString().replace(/:/g, '-');
+
 /**
  * @function readInputFromConsole
  * @description Reads input from the console and returns it
@@ -14,8 +19,13 @@ function readInputFromConsole(prompt) {
         output: process.stdout,
     });
 
+    const timestamp = new Date().toISOString();
+    let formattedPrompt = `[${timestamp}] [INPT] ${prompt}`;
+    // Attention grabber - bg: yellow, fg: black
+    formattedPrompt = chalk.cyan(formattedPrompt);
+
     return new Promise((resolve) => {
-        rl.question(prompt, (input) => {
+        rl.question(formattedPrompt, (input) => {
             rl.close();
             resolve(input.trim());
         });

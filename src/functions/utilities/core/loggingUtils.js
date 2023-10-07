@@ -13,9 +13,8 @@ const logFileName = `${currentDate}_${currentTime}.log`;
  */
 function createLogsFolder() {
     const logsFolderPath = path.join(__dirname, '../../../logs');
-    if (!fs.existsSync(logsFolderPath)) {
-        fs.mkdirSync(logsFolderPath);
-    }
+    if (!fs.existsSync(logsFolderPath)) fs.mkdirSync(logsFolderPath);
+
 }
 
 /**
@@ -36,6 +35,9 @@ function writeToFile(logText, logFileName) {
  * @param {("ERROR"|"WARNING"|"INFO"|"SUCCESS")} [logLevel=INFO] - The log level. Possible values: "ERROR", "WARNING", "INFO".
  */
 function logMessage(message, logLevel = 'INFO') {
+
+    if (message.startsWith(`Hello, world!`)) return;
+
     const timestamp = new Date().toISOString();
     const formattedMessage = `[${timestamp}] [${logLevel}] ${message}`;
 
