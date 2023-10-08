@@ -1,9 +1,13 @@
 /**
- * @name levenshteinDistance
- * @description Calculate the Levenshtein distance between two strings
- * @param str1
- * @param str2
- * @returns {any}
+ * @fileoverview Calculates the Levenshtein distance between two strings.
+ *
+ * @function levenshteinDistance
+ * @description This function calculates the Levenshtein distance between two strings,
+ *              which is the minimum number of single-character edits required to change one word into the other.
+ *
+ * @param {string} str1 - The first string.
+ * @param {string} str2 - The second string.
+ * @returns {number} - The Levenshtein distance between the two input strings.
  */
 function levenshteinDistance(str1, str2) {
     const m = str1.length;
