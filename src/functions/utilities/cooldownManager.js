@@ -13,9 +13,11 @@ const {workCooldowns, robCooldowns, gambleCooldowns} = { workCooldowns: {}, robC
  */
 const getCooldown = async (userId, guildId, type) => {
     const cooldowns = {work: workCooldowns, rob: robCooldowns, gamble: gambleCooldowns};
-    if (!cooldowns[type]) return false;
-    if (!cooldowns[type][guildId]) return false;
-    if (!cooldowns[type][guildId][userId]) return false;
+    if (cooldowns[type] && cooldowns[type][guildId] && cooldowns[type][guildId][userId] && cooldowns[type][guildId][userId].cooldown < Date.now()) {
+        delete cooldowns[type][guildId][userId];
+        return Promise.resolve(false);
+    }
+    if (!cooldowns[type] || !cooldowns[type][guildId] || !cooldowns[type][guildId][userId]) return Promise.resolve(false);
     return Promise.resolve(cooldowns[type][guildId][userId].cooldown);
 }
 
