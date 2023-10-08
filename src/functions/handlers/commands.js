@@ -1,6 +1,11 @@
+/**
+ * @fileoverview This file handles the registration of slash commands.
+ */
+
 require('dotenv').config();
 const {logMessage} = require('../utilities/core/loggingUtils');
 logMessage(`Hello, world! From handleCommands.js`, `INFO`);
+
 
 const {REST, Routes, EmbedBuilder} = require('discord.js');
 const guildModel = require("../../models/guildModel");
@@ -11,11 +16,9 @@ const rest = new REST({version: '9'}).setToken(token);
 require('dotenv').config();
 
 /**
- * @name registerSlashCommands
- * @type {module}
- * @description Register slash commands
- * @param {Object} client Discord client
- * @param {Array} commands Array of commands to register
+ * @name Registers slash commands for a Discord client.
+ * @param {Object} client - The Discord client object.
+ * @param {Array} commands - An array of commands to register.
  */
 
 async function registerSlashCommands(client, commands) {
@@ -32,11 +35,10 @@ async function registerSlashCommands(client, commands) {
 }
 
 /**
- * @name handleCommandInteractions
- * @type {module}
- * @description Handle command interactions and register slash commands
- * @param language
- * @param code
+ * @name Handles executing the provided code in a specified programming language.
+ * @param {string} language - The programming language for code execution.
+ * @param {string} code - The code to be executed.
+ * @returns {Promise<Object>} - A promise that resolves to the execution response.
  */
 
 async function runCode(language, code) {
@@ -62,6 +64,10 @@ async function runCode(language, code) {
 
 }
 
+/**
+ * @name Creates a user if not found in the database.
+ * @param {Object} interaction - The interaction object.
+ */
 async function createUserIfNotFound(interaction) {
     const userModel = require('../../models/userModel');
 
@@ -75,6 +81,12 @@ async function createUserIfNotFound(interaction) {
         return interaction.reply({ content: 'Whoops! Something went wrong.', ephemeral: true });
     }
 }
+
+
+/**
+ * @name Creates a guild if not found in the database.
+ * @param {Object} interaction - The interaction object.
+ */
 
 async function createGuildIfNotFound(interaction) {
     const guildModel = require('../../models/guildModel');
