@@ -59,7 +59,7 @@ module.exports = {
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId(`e`)
-                    .setLabel(`Banned by ${interaction.user.username}`)
+                    .setLabel(`Banned by ${interaction.user.displayName}`)
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(true)
                     .setEmoji(`🔨`)
@@ -82,7 +82,7 @@ module.exports = {
 
         if (dryrun === true) return sendEmbed(interaction, EmbedType.SUCCESS, `Dryrun successful.`, buttonRow);
         await interaction.guild.members.ban(user, {reason: reason});
-        return sendEmbed(interaction, EmbedType.SUCCESS, `Successfully banned ${user.username}#${user.discriminator}.`, buttonRow);
+        return sendEmbed(interaction, EmbedType.SUCCESS, `Successfully banned ${user.displayName}.`, buttonRow);
 
     }
 }

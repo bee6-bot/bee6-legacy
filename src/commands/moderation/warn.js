@@ -48,10 +48,10 @@ module.exports = {
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId(`e`)
-                    .setLabel(`Warned by ${interaction.user.username}`)
+                    .setLabel(`Warned by ${interaction.user.displayName}`)
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(true)
-                    .setEmoji(`⚠️`),
+                    .setEmoji(`�`),
                 new ButtonBuilder()
                     .setCustomId(`warn:${punishmentID}:revoke`)
                     .setLabel(`Revoke`)
@@ -65,7 +65,7 @@ module.exports = {
         await punishment.save();
         await User.save();
         await sendEmbed(interaction, EmbedType.SUCCESS,
-            `Warned ${user.username}`, `\`ID: ${punishmentID}\` | **Warned for:** ${reason}`, false, [buttonRow]);
+            `Warned ${user.displayName}`, `\`ID: ${punishmentID}\` | **Warned for:** ${reason}`, false, [buttonRow]);
 
 
     }

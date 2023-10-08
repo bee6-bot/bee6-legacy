@@ -43,7 +43,7 @@ module.exports = {
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId(`e`)
-                    .setLabel(`Kicked by ${interaction.user.username}`)
+                    .setLabel(`Kicked by ${interaction.user.displayName}`)
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(true)
                     .setEmoji(`👢`)

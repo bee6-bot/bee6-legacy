@@ -18,6 +18,6 @@ module.exports = {
 
         const percentage = Math.floor((xp / (xpNeeded + xp)) * 100);
         const progressBar = drawProgressBar(percentage, 20);
-        await sendEmbed(interaction, EmbedType.INFO, `Level`, `Level: ${level.toFixed(0)}\nXP: ${xp.toFixed(0)} / ${xpTotal.toFixed(0)}\n${progressBar}`);
+        await sendEmbed(interaction, EmbedType.INFO, `${user.displayName}'s Level`, `Level: ${level.toFixed(0)}\nXP: ${xp.toFixed(0)} / ${xpTotal.toFixed(0)}\n${progressBar}`);
     }
 }

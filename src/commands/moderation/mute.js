@@ -60,7 +60,7 @@ module.exports = {
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId(`e`)
-                    .setLabel(`Muted by ${interaction.user.username}`)
+                    .setLabel(`Muted by ${interaction.user.displayName}`)
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(true)
                     .setEmoji(`🔇`),
@@ -88,7 +88,7 @@ module.exports = {
         await punishment.save();
         await user.timeout(parseInt(duration), reason);
         await sendEmbed(interaction, EmbedType.SUCCESS,
-            `${duration === '0' ? `Unmuted` : `Muted`} ${user.user.username}`, `\`ID: ${punishmentID}\` | **${duration === '0' ? `Unmuted` : `Muted`} for:** ${reason}`, false, [buttonRow]);
+            `${duration === '0' ? `Unmuted` : `Muted`} ${user.user.displayName}`, `\`ID: ${punishmentID}\` | **${duration === '0' ? `Unmuted` : `Muted`} for:** ${reason}`, false, [buttonRow]);
 
 
     }
