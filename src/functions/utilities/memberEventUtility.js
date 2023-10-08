@@ -6,6 +6,7 @@
 const guildModel = require("../../models/guildModel");
 const userModel = require("../../models/userModel");
 const {EmbedBuilder} = require("discord.js");
+const { checkUser } = require("./makerSurerExister");
 
 let placeholders = {
     user: ``,
@@ -49,7 +50,9 @@ async function sendWelcomeLeaveMessage(member, type) {
     const channel = member.guild.channels.cache.get(channelID);
     if (!channel) return;
 
+    await checkUser(member.id, member.guild.id);
     const userData = await userModel.findOne({userID: member.id});
+
     let message;
 
     try {
