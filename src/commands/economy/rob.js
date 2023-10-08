@@ -21,9 +21,8 @@ module.exports = {
         try {
             const chance = Math.floor(Math.random() * 100);
             if (chance < 0) return await sendEmbed(
-                interaction,
-                EmbedType.ERROR,
-                `Rob`, `You were caught and fined ${formatMoney(cash * 0.1)}!`,
+                interaction, EmbedType.ERROR,
+                `Rob`, `You tried to rob ${interaction.options.getUser('user').displayName} but were caught and fined ${formatMoney(cash * 0.1)}!`,
                 false
             );
         } catch (e) {
@@ -46,7 +45,7 @@ module.exports = {
         try {
             await sendEmbed(
                 interaction, EmbedType.SUCCESS,
-                `Rob`, `You robbed ${interaction.options.getUser('user').username} and got away with ${formatMoney(amount)}!`,
+                `Rob`, `You robbed ${interaction.options.getUser('user').displayName} and got away with ${formatMoney(amount)}!`,
                 false
             );
         } catch (e) {

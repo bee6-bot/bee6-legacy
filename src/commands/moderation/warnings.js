@@ -25,7 +25,7 @@ module.exports = {
 
         if (warnings.length === 0) return await sendEmbed(interaction, EmbedType.ERROR, `Warnings`, `This user has no warnings.`, true);
         const warningString = warnings.map(warning => `**${warning.punishmentID}** - ${warning.punishmentReason}`).join(`\n`);
-        await sendEmbed(interaction, EmbedType.INFO, `Warnings`, warningString, true);
-
+        await sendEmbed(interaction, EmbedType.INFO, `${user.username}'s warnings`,
+            `${warningString}\n\n**Total:** ${warnings.length}`, true);
     }
 }
