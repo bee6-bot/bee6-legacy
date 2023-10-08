@@ -103,6 +103,16 @@ const ActionType = {
     "THREAD_DELETE": 112
 };
 
+/**
+ * @async
+ * @function getResponsibleUser
+ * @description Gets the responsible user for a specific event in a guild.
+ * @param {Object} client - The Discord client object.
+ * @param {Object} guild - The guild where the event occurred.
+ * @param {string} event - The event type (e.g., "GUILD_MEMBER_BAN_ADD").
+ * @param {string} targetId - The ID of the target associated with the event.
+ * @returns {Promise<?Object>} - The user who triggered the event, or null if not found.
+ */
 async function getResponsibleUser(client, guild, event, targetId) {
     try {
         const logs = await guild.fetchAuditLogs({type: ActionType[event]});

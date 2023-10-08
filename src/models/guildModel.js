@@ -6,6 +6,10 @@ const guildSchema = new mongoose.Schema({
     guildID: {type: String, required: true, index: true},
     language: {type: String, default: 'en'}, // Unused
     disabledCommands: {type: Array, default: []},
+    miscSettings: {
+        private: {type: Boolean, default: true}, // Whether to hide the guild from the API
+    },
+    tags: { type: Array },
 
     // Moderation
     mutedRoleID: {type: String, default: ''},

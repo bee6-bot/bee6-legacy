@@ -16,6 +16,11 @@ const fs = require('fs');
 const path = require('path');
 console.log()
 
+logMessage(`Running in ${process.env.NODE_ENV} mode.`, `INFO`)
+logMessage(`Node version: ${process.version}`, `INFO`)
+logMessage(`Discord.js version: ${require('discord.js').version}`, `INFO`)
+console.log()
+
 // 1.4: Database
 const mongoose = require('mongoose')
 // const Models = {
@@ -80,19 +85,20 @@ async function checkForUpdates() {
 
         const readInputFromConsole = require('./functions/utilities/core/inputUtils.js')
 
-        console.log()
-        logMessage(`New commit found!`, `INFO`)
-        logMessage(`Last commit: ${lastCommit} ${lastCommitMessage}`, `INFO`)
-        logMessage(`Current commit: ${currentCommit} ${currentCommitMessage}`, `INFO`)
-        const input = await readInputFromConsole(`Would you like to update? (y/N) `)
+        logMessage(`    New commit found!`, `INFO`)
+        logMessage(`    Last commit: ${lastCommit} ${lastCommitMessage}`, `INFO`)
+        logMessage(`    Current commit: ${currentCommit} ${currentCommitMessage}`, `INFO`)
+        const input = await readInputFromConsole(`    Would you like to update? (y/N) `)
         if (input.toLowerCase() === 'y') {
-            logMessage(`Updating...`, `INFO`)
+            logMessage(`    Updating...`, `INFO`)
             require('child_process').execSync('git pull').toString().trim();
-            logMessage(`Updated!`, `INFO`)
+            logMessage(`    Updated!`, `INFO`)
             process.exit(0)
         } else {
-            logMessage(`Not updating.`, `INFO`)
+            logMessage(`    Not updating.`, `INFO`)
         }
+    } else {
+        logMessage(`    No updates found, you're up to date!`, `INFO`)
     }
 
 }
@@ -100,14 +106,14 @@ async function checkForUpdates() {
 
 // 2.1: Command and button handlers
 async function initializeHandlers() {
-    logMessage(`Initializing command handlers...`, `INFO`)
     await require('./functions/handlers/commands.js')(client)
 
+    // Temporarily removed event handlers as they seem to cause interactions to be delayed
     logMessage(`Initializing event handlers...`, `INFO`)
     await require('./functions/handlers/events.js')(client)
 
-    logMessage(`Initializing button handlers...`, `INFO`)
-    await require('./functions/handlers/buttons.js')(client)
+    logMessage(`Initializing command handlers...`, `INFO`)
+
 }
 
 // 2.1: Initialize client
@@ -199,7 +205,24 @@ process.on('unhandledRejection', (err) => logMessage(err.stack, 'ERROR'));
 process.on('uncaughtException', (err) => logMessage(err.stack, 'ERROR'));
 
 // 3.3: Process exit
-process.on('exit', (code) => {
-    logMessage(`Process exited with code ${code}`, 'INFO');
-    mongoose.connection.close();
-});
+process.stdin.resume();
+let exited = false;
+function exitHandler(exitCode) {
+    if (exited) return;
+    exited = true;
+    console.log(`\n\n\n `)
+    logMessage(`Process exited with code ${exitCode}`, 'SUCCESS');
+    const logFiles = fs.readdirSync(path.join(__dirname, 'logs'));
+    const lastEditedLogFile = logFiles.reduce((prev, curr) => {
+        const prevStat = fs.statSync(path.join(__dirname, 'logs', prev));
+        const currStat = fs.statSync(path.join(__dirname, 'logs', curr));
+        return prevStat.mtimeMs > currStat.mtimeMs ? prev : curr;
+    });
+    logMessage(`View this session's logs at ${path.join(__dirname, 'logs', lastEditedLogFile)}`, 'INFO');
+    process.exit();
+}
+
+process.on('exit', exitHandler.bind(null));
+process.on('SIGINT', exitHandler.bind(null));
+process.on('SIGUSR1', exitHandler.bind(null));
+process.on('SIGUSR2', exitHandler.bind(null));

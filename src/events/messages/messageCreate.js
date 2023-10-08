@@ -154,10 +154,17 @@ module.exports = {
                 return {text: "Invalid version"};
             }
 
-            let response = await fetch(url + args)
-            response = await response.json();
-            console.log(response)
-            return {text: response.text, time: Date.now() - start};
+            try {
+                let response = await fetch(url + args)
+                response = await response.json();
+                if (response.text === "gpt model did not return a response, try modifying your prompt.") {
+                    return {text: "¯\\_(ツ)_/¯ I don't know what to say.", time: Date.now() - start};
+                } else {
+                    return {text: response.text, time: Date.now() - start};
+                }
+            } catch (e) {
+                return {text: "¯\\_(ツ)_/¯ The response timed out.", time: Date.now() - start};
+            }
         }
 
         if (await isLoggingChannel(message.channel.id)) return;
@@ -192,13 +199,14 @@ module.exports = {
             if (message.reference) {
                 const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
                 response = await aiReply(prompt, referencedMessage.content, context, version);
+            } else {
+                response = await aiReply(prompt, "", context, version);
             }
 
             if (!response) response = await aiReply(prompt, "", context, version);
-            console.log(response)
 
             await message.reply({
-                content: `\`V${version}\` \`Took at least 0.0001ms\` ${response.text}`,
+                content: `\`V${version}\` ${response.text}`,
                 allowedMentions: {repliedUser: true}
             });
 

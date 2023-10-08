@@ -36,8 +36,7 @@ module.exports = {
                     .setName('channel')
                     .setDescription('The channel to send the logs to.')
                     .setRequired(true)
-                ))
-        )
+                )))
         .addSubcommandGroup(group => group
             .setName('member-events')
             .setDescription('Configure member event settings, such as join and leave messages.')
@@ -80,8 +79,18 @@ module.exports = {
                     .setName('message')
                     .setDescription('The message to send.')
                     .setRequired(true)
-                ))
-        ),
+                )))
+        .addSubcommandGroup(group => group
+            .setName('misc')
+            .setDescription('Configure miscellaneous settings.')
+            .addSubcommand(subcommand => subcommand
+                .setName('private')
+                .setDescription('Whether the guild is viewable on the public API.')
+                .addBooleanOption(option => option
+                    .setName('enabled')
+                    .setDescription('Enable or disable private mode.')
+                    .setRequired(true)
+                ))),
 
 
     async execute(interaction) {
@@ -106,6 +115,7 @@ module.exports = {
                 }
 
                 break;
+
             case 'mod-log':
                 if (enabled) {
                     guild.modLog = true;
@@ -129,7 +139,6 @@ module.exports = {
                 }
 
                 break;
-
             case 'leave-message':
                 if (enabled) {
                     guild.leave = true;
@@ -142,7 +151,6 @@ module.exports = {
                 }
 
                 break;
-
             case 'variables':
 
                 const variables = Object.keys(placeholders).map(key => `\`${key}\``).join(', ');
@@ -152,6 +160,10 @@ module.exports = {
                     + `\n\nTo use a variable, wrap the variable name in [{variable}].`
                     + `For example, \`[{user}]\` will be replaced with <@${interaction.user.id}>.`);
                 return;
+
+            case 'private':
+                guild.miscSettings.private = enabled;
+                break;
 
             default:
                 break;

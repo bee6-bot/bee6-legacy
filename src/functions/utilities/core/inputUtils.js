@@ -1,5 +1,5 @@
-
 const readline = require('readline');
+const chalk = require('chalk');
 
 /**
  * @function readInputFromConsole
@@ -14,8 +14,12 @@ function readInputFromConsole(prompt) {
         output: process.stdout,
     });
 
+    const timestamp = new Date().toISOString();
+    let formattedPrompt = `[${timestamp}] [INPT] ${prompt}`;
+    formattedPrompt = chalk.cyan(formattedPrompt);
+
     return new Promise((resolve) => {
-        rl.question(prompt, (input) => {
+        rl.question(formattedPrompt, (input) => {
             rl.close();
             resolve(input.trim());
         });

@@ -2,13 +2,14 @@ const Guild = require('../../models/guildModel');
 const {logMessage} = require("./core/loggingUtils");
 const {workCooldowns, robCooldowns, gambleCooldowns} = { workCooldowns: {}, robCooldowns: {}, gambleCooldowns: {} }
 
+
 /**
- * @name getCooldown
- * @description Get the cooldown for a user in a guild for a specific type
- * @param userId
- * @param guildId
- * @param type
- * @returns {Promise<*|boolean>}
+ * @function getCooldown
+ * @description Gets the cooldown for a user in a guild for a specific type.
+ * @param {string} userId - The user ID.
+ * @param {string} guildId - The guild ID.
+ * @param {string} type - The type of cooldown ('work', 'rob', or 'gamble').
+ * @returns {Promise<number|boolean>} - The cooldown time in milliseconds, or `false` if no cooldown exists.
  */
 const getCooldown = async (userId, guildId, type) => {
     const cooldowns = {work: workCooldowns, rob: robCooldowns, gamble: gambleCooldowns};
@@ -19,12 +20,13 @@ const getCooldown = async (userId, guildId, type) => {
 }
 
 /**
- * @name setCooldown
- * @description Set the cooldown for a user in a guild for a specific type
- * @param userId
- * @param guildId
- * @param type
- * @returns {Promise<boolean>}
+ * @function setCooldown
+ * @description Sets the cooldown for a user in a guild for a specific type.
+ * @param {string} userId - The user ID.
+ * @param {string} guildId - The guild ID.
+ * @param {string} type - The type of cooldown ('work', 'rob', or 'gamble').
+ * @returns {Promise<boolean>} - A promise that resolves to `true` if the cooldown is successfully set, or `false` otherwise.
+ * @throws Will throw an error if an error occurs during the process.
  */
 const setCooldown = async (userId, guildId, type) => {
     const cooldowns = {work: workCooldowns, rob: robCooldowns, gamble: gambleCooldowns};
