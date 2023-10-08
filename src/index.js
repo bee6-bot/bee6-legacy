@@ -149,7 +149,7 @@ async function connectToDatabase() {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        logMessage(`Connected to MongoDB!`, `INFO`);
+        logMessage(`Connected to MongoDB!`, `SUCCESS`);
 
     } catch (err) {
         logMessage(`Error connecting to MongoDB: ${err.stack}`, `ERROR`)
@@ -161,11 +161,11 @@ async function connectToDatabase() {
     });
 
     mongoose.connection.on('disconnected', () => {
-        logMessage(`Disconnected from MongoDB!`, `INFO`)
+        logMessage(`Disconnected from MongoDB!`, `ERROR`)
     });
 
     mongoose.connection.on('reconnected', () => {
-        logMessage(`Reconnected to MongoDB!`, `INFO`)
+        logMessage(`Reconnected to MongoDB!`, `SUCCESS`)
     });
 
     mongoose.connection.on('connecting', () => {
