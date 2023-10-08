@@ -33,6 +33,13 @@ function writeToFile(logText, logFileName) {
  * Logs messages with timestamp to the console and writes them to a log file.
  * @param {string} message - The log message to be displayed.
  * @param {("ERROR"|"WARNING"|"INFO"|"SUCCESS")} [logLevel=INFO] - The log level. Possible values: "ERROR", "WARNING", "INFO".
+ * @returns {void}
+ *
+ * @example logMessage('This is an info message.', 'INFO');
+ * @example logMessage('This is a warning message.', 'WARNING');
+ * @example logMessage('This is an error message.', 'ERROR');
+ * @example logMessage('This is a message with the default log level.');
+ * @example logMessage('This is a success message.', 'SUCCESS');
  */
 function logMessage(message, logLevel = 'INFO') {
 
@@ -71,10 +78,5 @@ function logMessage(message, logLevel = 'INFO') {
 createLogsFolder();
 logMessage('Hello, world, from logging.js!', 'INFO');
 
-// Example usage:
-// logMessage('This is an info message.', 'INFO');
-// logMessage('This is a warning message.', 'WARNING');
-// logMessage('This is an error message.', 'ERROR');
-// logMessage('This is a message with the default log level.');
 
 module.exports = { logMessage };

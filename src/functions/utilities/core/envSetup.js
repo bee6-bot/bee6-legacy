@@ -4,13 +4,13 @@ const readFromConsole = require(`./inputUtils.js`)
 
 const {logMessage} = require('./loggingUtils.js')
 
+
+
 /**
- * @name envSetup
- * @type {module}
- * @description Check if .env variables for the bot exist. If not, create them.
+ * @name setupEnv
+ * @desc Asynchronously sets up the environment variables needed for the bot to function.
+ * @async
  */
-
-
 async function setupEnv() {
 
     const fileExists = fs.existsSync(`./.env`)
