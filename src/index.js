@@ -41,7 +41,7 @@ const mongoose = require('mongoose')
 // const {getMemberData} = require('./functions/helpers/memberData.js')
 
 // 1.6: Debugging
-let debug = process.env.DEBUG === 'true'
+let debug = process.env.DEV_MODE === 'true'
 
 // 1.7: Client & API
 const client = new Client({
@@ -62,7 +62,7 @@ client.buttonArray = []
 // ===============================================
 
 logMessage(`Readying up...`, `INFO`)
-logMessage(`Debug mode: ${debug}`, `INFO`)
+logMessage(`Development mode: ${debug}`, `INFO`)
 
 // 2.05 Check if there is a new commit
 
@@ -120,7 +120,8 @@ async function initializeHandlers() {
 async function initializeClient() {
     logMessage(`Initializing client...`, `INFO`)
     try {
-        await client.login(process.env.TOKEN);
+        if (process.env.DEV_MODE === 'true') await client.login(process.env.DEV_TOKEN);
+        else await client.login(process.env.TOKEN);
         logMessage(`Client initialized!`, `SUCCESS`);
         logMessage(`Logged in as ${client.user.tag}!`, `SUCCESS`);
 
@@ -141,7 +142,7 @@ async function initializeClient() {
 // 2.2.1: Connect to MongoDB
 async function connectToDatabase() {
     logMessage(`Connecting to MongoDB...`, `INFO`)
-    const mongoURI = process.env.MONGO_URI;
+    const mongoURI = process.env.DEV_MODE === 'true' ? process.env.DEV_MONGO_URI : process.env.MONGO_URI;
     mongoose.set(`strictQuery`, true);
 
     try {
@@ -226,3 +227,5 @@ process.on('exit', exitHandler.bind(null));
 process.on('SIGINT', exitHandler.bind(null));
 process.on('SIGUSR1', exitHandler.bind(null));
 process.on('SIGUSR2', exitHandler.bind(null));
+
+module.exports = {client, debug}
