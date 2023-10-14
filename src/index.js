@@ -41,7 +41,7 @@ const mongoose = require('mongoose')
 // const {getMemberData} = require('./functions/helpers/memberData.js')
 
 // 1.6: Debugging
-let debug = process.env.DEBUG === 'true'
+let debug = process.env.DEV_MODE === 'true'
 
 // 1.7: Client & API
 const client = new Client({
@@ -62,7 +62,7 @@ client.buttonArray = []
 // ===============================================
 
 logMessage(`Readying up...`, `INFO`)
-logMessage(`Debug mode: ${debug}`, `INFO`)
+logMessage(`Development mode: ${debug}`, `INFO`)
 
 // 2.05 Check if there is a new commit
 
