@@ -10,7 +10,8 @@ logMessage(`Hello, world! From handleCommands.js`, `INFO`);
 const {REST, Routes, EmbedBuilder} = require('discord.js');
 const guildModel = require("../../models/guildModel");
 const userModel = require("../../models/userModel");
-const token = process.env.TOKEN, clientId = process.env.CLIENT_ID;
+const token = process.env.DEV_MODE === 'true' ? process.env.DEV_TOKEN : process.env.TOKEN;
+const clientId = process.env.DEV_MODE === 'true' ? process.env.DEV_CLIENT_ID : process.env.CLIENT_ID;
 const rest = new REST({version: '9'}).setToken(token);
 
 require('dotenv').config();
@@ -115,8 +116,10 @@ module.exports = async (client) => {
         const commands = readdirSync(join(__dirname, '../../commands', dir)).filter(file => file.endsWith('.js'));
         for (const file of commands) {
             const command = require(`../../commands/${dir}/${file}`);
-            logMessage(`    Registered command ${command.data.name}`, `INFO`);
-            await client.commands.set(command.data.name, command);
+            const commandName = process.env.DEV_MODE === 'true' ? `${process.env.DEV_CMD_PREFIX}${command.data.name}` : `${process.env.CMD_PREFIX}${command.data.name}`;
+            command.data.name = commandName;
+            logMessage(`    Registered command ${commandName}`, 'INFO');
+            await client.commands.set(commandName, command);
             client.commandArray.push(command.data.toJSON());
         }
     }

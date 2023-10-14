@@ -120,7 +120,8 @@ async function initializeHandlers() {
 async function initializeClient() {
     logMessage(`Initializing client...`, `INFO`)
     try {
-        await client.login(process.env.TOKEN);
+        if (process.env.DEV_MODE === 'true') await client.login(process.env.DEV_TOKEN);
+        else await client.login(process.env.TOKEN);
         logMessage(`Client initialized!`, `SUCCESS`);
         logMessage(`Logged in as ${client.user.tag}!`, `SUCCESS`);
 
@@ -141,7 +142,7 @@ async function initializeClient() {
 // 2.2.1: Connect to MongoDB
 async function connectToDatabase() {
     logMessage(`Connecting to MongoDB...`, `INFO`)
-    const mongoURI = process.env.MONGO_URI;
+    const mongoURI = process.env.DEV_MODE === 'true' ? process.env.DEV_MONGO_URI : process.env.MONGO_URI;
     mongoose.set(`strictQuery`, true);
 
     try {
