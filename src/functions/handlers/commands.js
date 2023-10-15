@@ -185,7 +185,8 @@ module.exports = async (client) => {
             try {
                 await command.autocomplete(interaction, client);
             } catch (error) {
-                await interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
+                logMessage(`Error running autocomplete for command ${command.data.name}`, `ERROR`)
+                logMessage(`    ${error.stack}`, `ERROR`)
             }
         }
         else if (interaction.isButton()) {
