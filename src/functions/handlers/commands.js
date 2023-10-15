@@ -159,19 +159,21 @@ module.exports = async (client) => {
             if (!id.startsWith('run-code_')) return;
 
             const language = id.split('_')[1];
-            const code = interaction.fields.getTextInputValue('run-code-input');
+            let code = interaction.fields.getTextInputValue('run-code-input');
             const output = await runCode(language, code);
+            output.run.output = output.run.output.replace(/`/g, "`\u200b");
+            code = code.replace(/`/g, "`\u200b");
 
             // noinspection JSCheckFunctionSignatures
             const embed = new EmbedBuilder()
                 .setAuthor({name: 'Made possible by Piston', url: 'https://github.com/engineer-man/piston'})
                 .setTitle(`${output.language} ${output.version} | Your code`)
-                .setDescription(`\`\`\`js\n${code}\`\`\``)
+                .setDescription("```js\n" + code + "```")
                 .setColor('#00ff00');
 
             const outputEmbed = new EmbedBuilder()
                 .setTitle('Output')
-                .setDescription(output.run.output || 'No output')
+                .setDescription("```js\n" + output.run.output + "```")
                 .setColor('#00ff00');
 
             await interaction.reply({embeds: [embed, outputEmbed], ephemeral: false});
