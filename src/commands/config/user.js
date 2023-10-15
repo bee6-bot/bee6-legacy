@@ -9,145 +9,113 @@ module.exports = {
         .setName('user')
         .setDescription('Configure user settings.')
 
-        .addSubcommand(subcommand => subcommand
-            .setName('my-data')
-            .setDescription('View your data.')
+        .addStringOption(option => option
+            .setName('setting')
+            .setDescription('The setting to configure.')
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+        .addStringOption(option => option
+            .setName('value')
+            .setDescription('The value to set the setting to.')
+            .setRequired(false)
+        ),
+
+    async autocomplete(interaction) {
+
+        const focusedInput = interaction.options.getFocused();
+
+        const modelKeys = Object.keys(userModel.schema.paths);
+        const settings = modelKeys.map(key => ({name: key, value: key}));
+        const settingsArray = settings.map(setting => setting.name);
+
+        // Remove settings that are of type Array, and with a protected value of true
+        let filteredArray = settingsArray.filter(setting => {
+            const type = userModel.schema.paths[setting].instance;
+            const protectedValue = userModel.schema.paths[setting].options.protected || false;
+            return type !== 'Array' && !protectedValue;
+        });
+
+        filteredArray = filteredArray.filter(setting => setting.toLowerCase().includes(focusedInput.toLowerCase()));
+
+        // Limit to 25 options
+        if (filteredArray.length > 25) filteredArray.length = 25;
+
+        await interaction.respond(
+            // setting | note (if exists) | type
+            filteredArray.map(setting => ({name: `${setting} ${userModel.schema.paths[setting].options.notes ? "• " + userModel.schema.paths[setting].options.notes + ' | ' : ' | '}${userModel.schema.paths[setting].instance}`, value: setting}))
         )
 
-        .addSubcommand(subcommand => subcommand
-            .setName('favourites')
-            .setDescription('Set your favourite things.')
-            .addStringOption(option => option
-                .setName('type')
-                .setDescription('The type of favourite to set.')
-                .setRequired(true)
-                .addChoices(
-                    {name: 'Colour', value: 'favouriteColour'},
-                    {name: `Animal`, value: 'favouriteAnimal'},
-                    {name: `Food`, value: 'favouriteFood'},
-                    {name: `Movie`, value: 'favouriteMovie'},
-                    {name: `TV Show`, value: 'favouriteShow'}
-                )
-            )
-            .addStringOption(option => option
-                .setName('value')
-                .setDescription('The value to set.')
-                .setRequired(true)
-            )
-        )
-        .addSubcommandGroup(group => group
-            .setName('leveling')
-            .setDescription('Configure leveling settings.')
-            .addSubcommand(subcommand => subcommand
-                .setName('level-up-messages')
-                .setDescription('Enable or disable level up messages.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable level up messages.')
-                    .setRequired(true)
-                )
-            )
-            .addSubcommand(subcommand => subcommand
-                .setName('dm-level-up-messages')
-                .setDescription('Enable or disable DM level up messages.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable DM level up messages.')
-                    .setRequired(true)
-                )
-            ),
-        )
-        .addSubcommandGroup(group => group
-            .setName('appearance')
-            .setDescription('Configure appearance settings.')
-            .addSubcommand(subcommand => subcommand
-                .setName('compact-mode')
-                .setDescription('Enable or disable compact mode.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable compact mode.')
-                    .setRequired(true)
-                )
-            )
-        )
-        .addSubcommandGroup(group => group
-            .setName('moderation')
-            .setDescription('Configure moderation settings.')
-            .addSubcommand(subcommand => subcommand
-                .setName('dm-notifications')
-                .setDescription('Enable or disable DM notifications when actioned.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable DM notifications when actioned.')
-                    .setRequired(true)
-                )
-            )
-        ),
+    },
 
     async execute(interaction) {
 
-        const subcommand = interaction.options.getSubcommand();
-        const args = interaction.options.data;
-        const userID = interaction.user.id;
-        const guildID = interaction.guild.id;
-        const user = await userModel.findOne({userID: userID, guildID: guildID});
+        const setting = interaction.options.getString('setting').split(' ')[0];
+        let value = interaction.options.getString('value');
 
-        switch (subcommand) {
+        const userData = await userModel.findOne({userID: interaction.user.id, guildID: interaction.guild.id});
+        if (!userData) return interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
 
-            case 'my-data':
+        // If the value is empty, send the current value and the setting's notes
+        if (!value) {
 
-                await interaction.reply({content: 'Generating your data...', ephemeral: true});
+            const settingType = userModel.schema.paths[setting].instance;
+            const settingNotes = userModel.schema.paths[setting].options.notes || '';
 
-                // Create a .json file with the user's data
-                const data = JSON.stringify(user, null, 2);
-                const filename = `${userID}-${guildID}.json`;
-                writeFile(filename, data, (err) => {
-                    if (err) throw err;
-                });
+            let currentValue = userData[setting];
 
-                // Send the file to the user
-                await interaction.editReply({content: 'Here is your data:', files: [filename]});
-                await interaction.followUp({
-                    content: `Please note that this data is not encrypted and may contain sensitive information!`
-                        + `your **last 10 messages** are hashed using bcrypt, which is also used to protect `
-                        + `passwords! So, rest assured, your messages are safe with us! We don't share your data with `
-                        + `any third parties, and we don't sell your data! Remember, you can delete your data at any `
-                        + `time by using \`/user delete-data\`\*, and you can view our privacy policy [here](https://google.com/)\*.`
-                        + `\n\n \* *This is not yet implemented.*`,
+            if (settingType === 'Array') currentValue = userData[setting].join(', ');
+            if (settingType === 'Boolean') currentValue = userData[setting] ? 'true' : 'false';
+
+            // Only show the notes if they exist
+            let notes = '';
+            if (settingNotes) notes = `\n\n**Notes:** ${settingNotes}`;
+
+            return await sendEmbed(
+                interaction, EmbedType.INFO,
+                `Current value of ${setting}`,
+                `**Current Value:** ${currentValue}\n`
+                + `${notes ? notes + '\n' : ''}`
+                + `**Type:** ${settingType}`
+            );
+        }
+
+
+        const settingType = userData.schema.paths[setting].instance;
+
+        // Check if the setting's value is in the correct data type
+        if (settingType === 'Number') {
+            if (isNaN(value)) return interaction.reply({content: 'The value must be a number.', ephemeral: true});
+            value = parseInt(value);
+        }
+        if (settingType === 'Boolean') {
+            value = value.toLowerCase();
+            if (value !== 'true' && value !== 'false') return interaction.reply({
+                content: 'The value must be true or false.',
+                ephemeral: true
+            });
+        }
+
+        // Save the new value to the database
+        const oldValue = userData[setting];
+
+        // Must be able to catch errors such as x is not a valid enum value
+        try {
+            userData[setting] = value;
+            await userData.save();
+            await sendEmbed(
+                interaction, EmbedType.SUCCESS,
+                `Set value of ${setting}`,
+                `**Old value:** ${oldValue.toLocaleString()}`
+                + `\n**New value:** ${value.toLocaleString()}`
+            );
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                return interaction.reply({
+                    content: `The value must be one of the following: ${userData.schema.paths[setting].enumValues.join(', ')}`,
                     ephemeral: true
                 });
-
-
-                break;
-
-            case 'favourites':
-                const type = interaction.options.getString('type');
-                const value = interaction.options.getString('value');
-                user[type] = value;
-                break;
-            case 'level-up-messages':
-                const enabled = interaction.options.getBoolean('enabled');
-                user.preferences.levelUpMessages = enabled;
-                break;
-            case 'dm-level-up-messages':
-                const dmEnabled = interaction.options.getBoolean('enabled');
-                user.preferences.levelUpDMs = dmEnabled;
-                break;
-            case 'compact-mode':
-                const compactEnabled = interaction.options.getBoolean('enabled');
-                user.preferences.compactMode = compactEnabled;
-                break;
-            case 'dm-notifications':
-                const dmNotificationsEnabled = interaction.options.getBoolean('enabled');
-                user.preferences.moderationDMs = dmNotificationsEnabled;
-                break;
-        }
-
-        if (subcommand !== 'my-data') {
-            await user.save();
-            await sendEmbed(interaction, EmbedType.INFO, 'User Configuration', `Set \`${subcommand}\``
-                + `\n\`\`\`json\n${JSON.stringify(args, null, 2)}\`\`\``);
+            }
         }
     }
-
 }

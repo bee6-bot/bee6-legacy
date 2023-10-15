@@ -8,172 +8,112 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('guild')
         .setDescription('Configure guild settings.')
-        .addSubcommandGroup(group => group
-            .setName('moderation')
-            .setDescription('Configure moderation settings.')
-            .addSubcommand(subcommand => subcommand
-                .setName('continuous-logging')
-                .setDescription('A continuous stream of messages in a centralized channel.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable continuous logging.')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('channel')
-                    .setDescription('The channel to send the logs to.')
-                    .setRequired(true)
-                ))
-            .addSubcommand(subcommand => subcommand
-                .setName('mod-log')
-                .setDescription('Configure mod logs (message edits, deletes, etc.).')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable mod logs.')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('channel')
-                    .setDescription('The channel to send the logs to.')
-                    .setRequired(true)
-                )))
-        .addSubcommandGroup(group => group
-            .setName('member-events')
-            .setDescription('Configure member event settings, such as join and leave messages.')
-            .addSubcommand(subcommand => subcommand
-                .setName('variables')
-                .setDescription('Get a list of variables that can be used in join and leave messages.'))
 
-            .addSubcommand(subcommand => subcommand
-                .setName('join-message')
-                .setDescription('Configure join messages.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable join messages.')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('channel')
-                    .setDescription('The channel to send the messages to.')
-                    .setRequired(true)
-                )
-                .addStringOption(option => option
-                    .setName('message')
-                    .setDescription('The message to send.')
-                    .setRequired(true)
-                ))
-            .addSubcommand(subcommand => subcommand
-                .setName('leave-message')
-                .setDescription('Configure leave messages.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable leave messages.')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('channel')
-                    .setDescription('The channel to send the messages to.')
-                    .setRequired(true)
-                )
-                .addStringOption(option => option
-                    .setName('message')
-                    .setDescription('The message to send.')
-                    .setRequired(true)
-                )))
-        .addSubcommandGroup(group => group
-            .setName('misc')
-            .setDescription('Configure miscellaneous settings.')
-            .addSubcommand(subcommand => subcommand
-                .setName('private')
-                .setDescription('Whether the guild is viewable on the public API.')
-                .addBooleanOption(option => option
-                    .setName('enabled')
-                    .setDescription('Enable or disable private mode.')
-                    .setRequired(true)
-                ))),
+        .addStringOption(option => option
+            .setName('setting')
+            .setDescription('The setting to configure.')
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+        .addStringOption(option => option
+            .setName('value')
+            .setDescription('The value to set the setting to.')
+            .setRequired(false)
+        ),
 
+    async autocomplete(interaction) {
+
+        const focusedInput = interaction.options.getFocused();
+
+        const modelKeys = Object.keys(guildModel.schema.paths);
+        const settings = modelKeys.map(key => ({name: key, value: key}));
+        const settingsArray = settings.map(setting => setting.name);
+
+        // Remove settings that are of type Array, and with a protected value of true
+        let filteredArray = settingsArray.filter(setting => {
+            const type = guildModel.schema.paths[setting].instance;
+            const protectedValue = guildModel.schema.paths[setting].options.protected || false;
+            return type !== 'Array' && !protectedValue;
+        });
+
+        filteredArray = filteredArray.filter(setting => setting.toLowerCase().includes(focusedInput.toLowerCase()));
+
+        // Limit to 25 options
+        if (filteredArray.length > 25) filteredArray.length = 25;
+
+        await interaction.respond(
+            // setting | note (if exists) | type
+            filteredArray.map(setting => ({name: `${setting} ${guildModel.schema.paths[setting].options.notes ? "• " + guildModel.schema.paths[setting].options.notes + ' | ' : ''}${guildModel.schema.paths[setting].instance}`, value: setting}))
+        )
+    },
 
     async execute(interaction) {
 
-        const subcommand = interaction.options.getSubcommand();
-        const args = interaction.options.data;
-        const guildID = interaction.guild.id;
-        const guild = await guildModel.findOne({guildID: guildID});
-        const enabled = interaction.options.getBoolean('enabled');
-        const channel = interaction.options.getChannel('channel');
+        const setting = interaction.options.getString('setting').split(' ')[0];
+        let value = interaction.options.getString('value');
 
-        console.log(subcommand)
+        const guildData = await guildModel.findOne({guildID: interaction.guild.id});
+        if (!guildData) return interaction.reply({content: 'Whoops! Something went wrong.', ephemeral: true});
 
-        switch (subcommand) {
-            case 'continuous-logging':
-                if (enabled) {
-                    guild.continuousMessageLogging = true;
-                    guild.continuousMessageLoggingChannelID = channel.id;
-                } else {
-                    guild.continuousMessageLogging = false;
-                    guild.continuousMessageLoggingChannelID = '';
-                }
+        // If the value is empty, send the current value and the setting's notes
+        if (!value) {
 
-                break;
+            const settingType = guildModel.schema.paths[setting].instance;
+            const settingNotes = guildModel.schema.paths[setting].options.notes || '';
 
-            case 'mod-log':
-                if (enabled) {
-                    guild.modLog = true;
-                    guild.modLogChannelID = channel.id;
-                } else {
-                    guild.modLog = false;
-                    guild.modLogChannelID = '';
-                }
+            let currentValue = guildData[setting];
 
-                break;
+            if (settingType === 'Array') currentValue = guildData[setting].join(', ');
+            if (settingType === 'Boolean') currentValue = guildData[setting] ? 'true' : 'false';
 
-            case 'join-message':
-                if (enabled) {
-                    guild.welcome = true;
-                    guild.welcomeChannelID = channel.id;
-                    guild.welcomeMessage = interaction.options.getString('message');
-                } else {
-                    guild.welcome = false;
-                    guild.welcomeChannelID = '';
-                    guild.welcomeMessage = '';
-                }
+            // Only show the notes if they exist
+            let notes = '';
+            if (settingNotes) notes = `\n\n**Notes:** ${settingNotes}`;
 
-                break;
-            case 'leave-message':
-                if (enabled) {
-                    guild.leave = true;
-                    guild.leaveChannelID = channel.id;
-                    guild.leaveMessage = interaction.options.getString('message');
-                } else {
-                    guild.leave = false;
-                    guild.leaveChannelID = '';
-                    guild.leaveMessage = '';
-                }
-
-                break;
-            case 'variables':
-
-                const variables = Object.keys(placeholders).map(key => `\`${key}\``).join(', ');
-                await sendEmbed(interaction, EmbedType.INFO,
-                    'Guild Configuration', `Variables that can be used in join and leave messages:`
-                    + `\n${variables}`
-                    + `\n\nTo use a variable, wrap the variable name in [{variable}].`
-                    + `For example, \`[{user}]\` will be replaced with <@${interaction.user.id}>.`);
-                return;
-
-            case 'private':
-                guild.miscSettings.private = enabled;
-                break;
-
-            default:
-                break;
-
-
+            return await sendEmbed(
+                interaction, EmbedType.INFO,
+                `Current value of ${setting}`,
+                `**Current Value:** ${currentValue}\n`
+                + `${notes ? notes + '\n' : ''}`
+                + `**Type:** ${settingType}`
+            );
         }
 
-        await guild.save();
-        await sendEmbed(interaction, EmbedType.INFO, 'Guild Configuration', `Set \`${subcommand}\``
-            + `\n\`\`\`json\n${JSON.stringify(args, null, 2)}\`\`\``);
+        const settingType = guildModel.schema.paths[setting].instance;
 
+        // Check if the setting's value is in the correct data type
+        if (settingType === 'Number') {
+            if (isNaN(value)) return interaction.reply({content: 'The value must be a number.', ephemeral: true});
+            value = parseInt(value);
+        }
+        if (settingType === 'Boolean') {
+            value = value.toLowerCase();
+            if (value !== 'true' && value !== 'false') return interaction.reply({
+                content: 'The value must be true or false.',
+                ephemeral: true
+            });
+        }
+
+        // Save the new value to the database
+        const oldValue = guildData[setting];
+
+        // Must be able to catch errors such as x is not a valid enum value
+        try {
+            guildData[setting] = value;
+            await guildData.save();
+            await sendEmbed(
+                interaction, EmbedType.SUCCESS,
+                `Set value of ${setting}`,
+                `**Old value:** ${oldValue.toLocaleString()}`
+                + `\n**New value:** ${value.toLocaleString()}`
+            );
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                return interaction.reply({
+                    content: `The value must be one of the following: ${guildModel.schema.paths[setting].enumValues.join(', ')}`,
+                    ephemeral: true
+                });
+            }
+        }
     }
 }
