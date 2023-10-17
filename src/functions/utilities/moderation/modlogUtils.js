@@ -21,4 +21,40 @@ async function shouldLogEvent(event, channelId, memberRoles, memberId) {
     return true;
 }
 
+/**
+ * @name getModLogChannel
+ * @description Gets a guild's mod log channels
+ * @param guildId
+ * @returns {Promise<{embed: *, normal: *}>}
+ */
+async function getModLogChannel(guildId) {
+
+    const guildData = await guildModel.findOne({guildID: guildId});
+
+    return {
+        normal: guildData.modLogChannelID,
+        continuousLogging: guildData.continuousMessageLoggingChannelID
+    }
+}
+
+/**
+ * @name getModLogIgnore
+ * @description Gets a guild's mod log ignore settings
+ * @param guildId
+ * @returns {Promise<{channels: *, events: *, roles: *, users: *}>}
+ */
+
+async function getModLogIgnore(guildId) {
+    const guildData = await guildModel.findOne({guildID: guildId});
+
+    return {
+        channels: guildData.modLogIgnore.channels,
+        events: guildData.modLogIgnore.events,
+        roles: guildData.modLogIgnore.roles,
+        users: guildData.modLogIgnore.users
+    }
+}
+
+// TODO: Add function to log events in a consistent way 
+
 module.exports = {shouldLogEvent}
