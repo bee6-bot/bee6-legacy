@@ -16,9 +16,19 @@ async function shouldLogEvent(event, channelId, memberRoles, memberId) {
     if (guildData.modLogIgnore.events.includes(event.name)) return false;
     if (guildData.modLogIgnore.channels.includes(channelId)) return false;
     if (guildData.modLogIgnore.roles.some(role => memberRoles.cache.has(role))) return false;
-    if (guildData.modLogIgnore.users.includes(memberId)) return false;
+    return !guildData.modLogIgnore.users.includes(memberId);
+}
 
-    return true;
+/**
+ * @name getCaseCount
+ * @description Gets the case count for a guild
+ * @param guildId
+ * @returns {Promise<number>}
+ */
+
+async function getCaseCount(guildId) {
+    const guildData = await guildModel.findOne({guildID: guildId});
+    return guildData.cases.length + 1;
 }
 
 /**
@@ -57,4 +67,4 @@ async function getModLogIgnore(guildId) {
 
 // TODO: Add function to log events in a consistent way 
 
-module.exports = {shouldLogEvent, getModLogChannel, getModLogIgnore};
+module.exports = {shouldLogEvent, getModLogChannel, getModLogIgnore, getCaseCount};
