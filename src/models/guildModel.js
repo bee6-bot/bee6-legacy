@@ -66,6 +66,7 @@ const guildSchema = new mongoose.Schema({
     leaveImage: {type: String, default: '', categories: ['leave', 'member_events']},
 
     // Moderation
+    cases: {type: Number, default: 1, protected: true, categories: ['moderation']},
     mutedRoleID: {type: String, default: '', categories: ['moderation']},
     modLogChannelID: {type: String, default: '', categories: ['moderation', 'logs']},
     modLog: {type: Boolean, default: false, categories: ['moderation', 'logs']},
