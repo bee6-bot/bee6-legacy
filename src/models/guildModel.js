@@ -21,33 +21,6 @@ const guildSchema = new mongoose.Schema({
     },
     tags: {type: Array, categories: ['general']},
 
-    // Moderation
-    mutedRoleID: {type: String, default: '', categories: ['moderation']},
-    modLogChannelID: {type: String, default: '', categories: ['moderation', 'logs']},
-    modLog: {type: Boolean, default: false, categories: ['moderation', 'logs']},
-    continuousMessageLogging: {
-        type: Boolean,
-        default: false,
-        categories: ['moderation', 'continuous_message_logging', 'logs'],
-        notes: 'Whether to log messages continuously',
-        description: 'Continuous Message Logging will log every message sent in the server to the Continuous Message' +
-            'Logging Channel. This may be useful in large servers with a lot of threads/posts.'
-    },
-
-    continuousMessageLoggingChannelID: {
-        type: String,
-        default: '',
-        categories: ['moderation', 'continuous_message_logging', 'logs'],
-        notes: 'The channel to log messages to',
-    },
-
-    modLogIgnore: {
-        channels: {type: Array, default: []},
-        roles: {type: Array, default: []},
-        users: {type: Array, default: []},
-        events: {type: Array, default: []}
-    },
-
     // Cooldowns
     workCooldown: {type: Number, default: 180000, categories: ['cooldowns']},
     robCooldown: {type: Number, default: 300000, categories: ['cooldowns']},
@@ -91,6 +64,33 @@ const guildSchema = new mongoose.Schema({
     },
     leaveEmbed: {type: Boolean, default: false, categories: ['leave', 'member_events']},
     leaveImage: {type: String, default: '', categories: ['leave', 'member_events']},
+
+    // Moderation
+    mutedRoleID: {type: String, default: '', categories: ['moderation']},
+    modLogChannelID: {type: String, default: '', categories: ['moderation', 'logs']},
+    modLog: {type: Boolean, default: false, categories: ['moderation', 'logs']},
+    continuousMessageLogging: {
+        type: Boolean,
+        default: false,
+        categories: ['moderation', 'continuous_message_logging', 'logs'],
+        notes: 'Whether to log messages continuously',
+        description: 'Continuous Message Logging will log every message sent in the server to the Continuous Message' +
+            'Logging Channel. This may be useful in large servers with a lot of threads/posts.'
+    },
+
+    continuousMessageLoggingChannelID: {
+        type: String,
+        default: '',
+        categories: ['moderation', 'continuous_message_logging', 'logs'],
+        notes: 'The channel to log messages to',
+    },
+
+    modLogIgnore: {
+        channels: {type: Array, default: []},
+        roles: {type: Array, default: []},
+        users: {type: Array, default: []},
+        events: {type: Array, default: []}
+    },
 
     // AutoMod - Kind of redundant due to Discord adding their own auto-mod system.
     //           This functionality likely won't be implemented
