@@ -57,4 +57,4 @@ async function getModLogIgnore(guildId) {
 
 // TODO: Add function to log events in a consistent way 
 
-module.exports = {shouldLogEvent}
+module.exports = {shouldLogEvent, getModLogChannel, getModLogIgnore};
