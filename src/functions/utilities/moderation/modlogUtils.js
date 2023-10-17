@@ -1,4 +1,4 @@
-const guildModel = require("../../models/guildModel");
+const guildModel = require("../../../models/guildModel");
 
 
 /**
