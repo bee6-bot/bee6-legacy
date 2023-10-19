@@ -39,9 +39,9 @@ module.exports = {
         try {
             await interaction.guild.members.ban(actionData.target, {reason: actionData.reason})
                 .then(async () => { await sendLog(); })
-                .catch(async (error) => { await interaction.reply({content: 'There was an error kicking this user: ' + error, ephemeral: false}); });
+                .catch(async (error) => { await interaction.reply({content: 'There was an error kicking this user', ephemeral: false}); });
         } catch (error) {
-            await interaction.reply({content: 'There was an error kicking this user: ' + error, ephemeral: false});
+            await interaction.reply({content: 'There was an error kicking this user', ephemeral: false});
         }
     }
 }
