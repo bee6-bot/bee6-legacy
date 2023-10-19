@@ -1,72 +1,71 @@
 const {SlashCommandBuilder, PermissionsBitField, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
-const userModel = require('../../models/userModel');
-const moderationModel = require('../../models/moderationModel');
+const {getModLogChannel} = require('../../functions/utilities/moderation/modlogUtils');
+const guildModel = require('../../models/guildModel');
+const {newCase, actionType} = require('../../functions/utilities/moderation/newCase');
 
 module.exports = {
-
     data: new SlashCommandBuilder()
-        .setName(`warn`)
-        .setDescription(`Warn a user.`)
+        .setName('warn')
+        .setDescription('Warns a user')
         .setDefaultMemberPermissions(PermissionsBitField.ManageMessages)
-        .addUserOption(option => option
-            .setName(`user`)
-            .setDescription(`The user to warn.`)
-            .setRequired(true)
-        )
-        .addStringOption(option => option
-            .setName(`reason`)
-            .setDescription(`The reason for the warning.`)
-            .setRequired(true)
-        )
-        .addStringOption(option => option
-            .setName(`evidence`)
-            .setDescription(`Relevant message links.`)
-            .setRequired(false)
-        ),
+        .addUserOption(option => option.setName('user').setDescription('The user to warn').setRequired(true))
+        .addStringOption(option => option.setName('reason').setDescription('The reason for the warning')),
+
+    category: 'Moderation',
+    description: 'Warns a user',
 
     async execute(interaction) {
 
-        const user = interaction.options.getUser(`user`);
-        const reason = interaction.options.getString(`reason`);
+        const actionData = {
+            moderator: interaction.user.id,
+            target: interaction.options.getUser('user'),
+            reason: interaction.options.getString('reason') || 'No reason provided'
+        };
 
-        const punishmentID = Math.random().toString(36).substring(2, 9);
-        const punishment = new moderationModel({
-            guildID: interaction.guild.id,
-            userID: user.id,
-            moderatorID: interaction.user.id,
+        // Get guild data
+        const guildData = await guildModel.findOne({guildID: interaction.guild.id}); // If not found, continue, do not attempt to log
+        const modLogChannel = await getModLogChannel(interaction.guild.id); // If not found, continue
 
-            punishmentType: `warn`,
-            punishmentID: punishmentID,
-            punishmentReason: reason,
-            punishmentDate: Date.now(),
-            punishmentDuration: `N/A`,
-            punishmentActive: true
+        // Get the caseID and create the case in the database
+        const caseID = await newCase(interaction.guild.id, {
+            ...actionData,
+            type: actionType.WARN
         });
 
+        // Send the embed with buttons
         const buttonRow = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId(`e`)
-                    .setLabel(`Warned by ${interaction.user.displayName}`)
+                    .setCustomId('moderator')
+                    .setLabel(`Warned by ${interaction.user.username}`)
                     .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(true)
-                    .setEmoji(`�`),
+                    .setEmoji('👮')
+                    .setDisabled(true),
                 new ButtonBuilder()
-                    .setCustomId(`warn:${punishmentID}:revoke`)
-                    .setLabel(`Revoke`)
-                    .setStyle(ButtonStyle.Danger)
-                    .setEmoji(`⚠️`)
-            );
+                    .setCustomId('case')
+                    .setLabel(`Case #${caseID}`)
+                    .setStyle(ButtonStyle.Secondary)
+                    .setEmoji('📄')
+                    .setDisabled(true)
+            )
 
-        const User = await userModel.findOne({guildID: interaction.guild.id, userID: user.id});
-        User.warnings.push(punishmentID);
+        // Respond to the interaction
+        await sendEmbed(
+            interaction, EmbedType.WARNING,
+            `Warned ${actionData.target.username}`,
+            `<@${actionData.target.id}> has been warned by <@${actionData.moderator}> for ${actionData.reason}`,
+            false, [buttonRow]
+        );
 
-        await punishment.save();
-        await User.save();
-        await sendEmbed(interaction, EmbedType.SUCCESS,
-            `Warned ${user.displayName}`, `\`ID: ${punishmentID}\` | **Warned for:** ${reason}`, false, [buttonRow]);
+        // Log the action in the mod logs
+        await sendEmbed(
+            interaction, EmbedType.WARNING,
+            `Warned ${actionData.target.username}`,
+            `<@${actionData.target.id}> has been warned by <@${actionData.moderator}> for ${actionData.reason}`,
+            false, [buttonRow], false, modLogChannel.normal
+        );
 
-
+        if (!guildData) return await sendEmbed(interaction, 'No guild data found, this event will not be logged', EmbedType.ERROR);
     }
-};
+}

@@ -1,6 +1,7 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, AuditLogEvent} = require("discord.js");
 const {getLogChannel} = require("../../functions/utilities/otherUtils");
 const {sendWelcomeLeaveMessage} = require("../../functions/utilities/memberEventUtility");
+const {newCase, actionType} = require('../../functions/utilities/moderation/newCase');
 
 /**
  * @fileoverview memberLogs
@@ -27,16 +28,24 @@ const eventInfo = [
             await sendWelcomeLeaveMessage(member, 'leave');
         }
     },
+
     {
         name: "guildBanAdd",
         eventType: "MEMBER BANNED",
         description: "Member Banned",
         getDescription: async (ban, client) => {
-            const auditLog = await ban.guild.fetchAuditLogs({type: 'MEMBER_BAN_ADD'}).then(audit => audit.entries.first());
+            const auditLog = await ban.guild.fetchAuditLogs({type: AuditLogEvent.MEMBER_BAN_ADD}).then(audit => audit.entries.first());
+            const eventCase = await newCase(ban.guild.id, {
+                moderator: auditLog.executor.id,
+                target: ban.user.id,
+                reason: auditLog.reason || 'No reason provided',
+                type: actionType.BAN
+            });
+
             return `**\`[EVENT TYPE]\`** | ` +
-                `**${ban.user.tag}** (<@${ban.user.id}>) | ` +
-                `**By:** ${auditLog.executor} (<@${auditLog.executor.id}>) | ` +
-                `**Reason:** ${auditLog.reason || 'No reason provided'}`;
+                `**${ban.user.tag}** (<@${ban.user.id}>) | Case #${eventCase} | ` +
+                `**By:** ${auditLog.executor.tag} (<@${auditLog.executor.id}>)`;
+
         }
     },
     {
@@ -44,10 +53,18 @@ const eventInfo = [
         eventType: "MEMBER UNBANNED",
         description: "Member Unbanned",
         getDescription: async (ban, client) => {
-            const auditLog = await ban.guild.fetchAuditLogs({type: 'MEMBER_BAN_REMOVE'}).then(audit => audit.entries.first());
+            const auditLog = await ban.guild.fetchAuditLogs({type: AuditLogEvent.MEMBER_BAN_REMOVE}).then(audit => audit.entries.first());
+            const eventCase = await newCase(ban.guild.id, {
+                moderator: auditLog.executor.id,
+                target: ban.user.id,
+                reason: auditLog.reason || 'No reason provided',
+                type: actionType.UNBAN
+            });
+
             return `**\`[EVENT TYPE]\`** | ` +
-                `**${ban.user.tag}** (<@${ban.user.id}>) | ` +
+                `**${ban.user.tag}** (<@${ban.user.id}>) | Case #${eventCase} | ` +
                 `**By:** ${auditLog.executor.tag} (<@${auditLog.executor.id}>)`;
+
         }
     }
 ]
@@ -62,6 +79,8 @@ module.exports = eventInfo.map(event => ({
             await event.function(...args, client);
             return;
         }
+
+        console.log(`${event.name} event fired`)
 
         const content = await event.getDescription(...args, client)
         await logChannel.send({embeds: [new EmbedBuilder().setDescription(content.replace('[EVENT TYPE]', event.eventType))]})

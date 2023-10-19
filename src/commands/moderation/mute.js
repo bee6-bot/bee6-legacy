@@ -1,96 +1,68 @@
 const {SlashCommandBuilder, PermissionsBitField, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
-const userModel = require('../../models/userModel');
-const moderationModel = require('../../models/moderationModel');
-const {checkUser} = require("../../functions/utilities/makerSurerExister");
+const {convertToMilliseconds, millisecondsToTime} = require('../../functions/utilities/timeUtil');
 
 module.exports = {
-
     data: new SlashCommandBuilder()
-        .setName(`mute`)
-        .setDescription(`Mute a user.`)
+        .setName('mute')
+        .setDescription('Mutes a user')
         .setDefaultMemberPermissions(PermissionsBitField.ModerateMembers)
-        .addUserOption(option => option
-            .setName(`user`)
-            .setDescription(`The user to mute.`)
-            .setRequired(true)
-        )
-        .addStringOption(option => option
-            .setName(`reason`)
-            .setDescription(`The reason for the mute.`)
-            .setRequired(true)
-        )
-        .addStringOption(option => option
-            .setName(`duration`)
-            .setDescription(`The duration of the mute.`)
-            .setRequired(true)
-            .addChoices(
-                {name: '60 seconds', value: '60'},
-                {name: '5 minutes', value: '300'},
-                {name: '10 minutes', value: '600'},
-                {name: '1 hour', value: '3600'},
-                {name: '1 day', value: '86400'},
-                {name: '1 week', value: '604800'},
-                {name: 'remove', value: '0'}
-            )),
+        .addUserOption(option => option.setName('user').setDescription('The user to mute').setRequired(true))
+        .addStringOption(option => option.setName('reason').setDescription('The reason for the mute').setRequired(true))
+        .addStringOption(option => option.setName('duration').setDescription('The duration of the mute').setRequired(true).setAutocomplete(true)),
+    category: 'Moderation',
+    description: 'Mutes a user',
+
+    async autocomplete(interaction) {
+        const focusedValue = interaction.options.getFocused();
+        const choices = ['5m', '10m', '30m', '1hr', '6hr', '1d', '7d'];
+        const filteredChoices = choices.filter(choice => choice.startsWith(focusedValue));
+        await interaction.respond(filteredChoices.map(choice => ({ name: choice, value: choice })));
+    },
 
     async execute(interaction) {
 
-        const user = interaction.options.getMember(`user`);
-        const reason = interaction.options.getString(`reason`);
-        let duration = interaction.options.getString(`duration`);
+        const actionData = {
+            moderator: interaction.user.id,
+            target: interaction.options.getUser('user'),
+            memberTarget: interaction.options.getMember('user'),
+            reason: interaction.options.getString('reason') || 'No reason provided',
+            duration: interaction.options.getString('duration') || '1hr'
+        };
 
-        if (!duration === '0') duration *= 1000;
+        const duration = convertToMilliseconds(actionData.duration);
+        async function sendLog() {
 
-        const punishmentID = Math.random().toString(36).substring(2, 9);
-        const punishment = new moderationModel({
-            guildID: interaction.guild.id,
-            userID: user.id,
-            moderatorID: interaction.user.id,
+            const buttonRow = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('moderator')
+                        .setLabel(`Muted by ${interaction.user.username}`)
+                        .setStyle(ButtonStyle.Secondary)
+                        .setEmoji('👮')
+                        .setDisabled(true),
+                    new ButtonBuilder()
+                        .setCustomId('duration')
+                        .setLabel(`Duration: ${millisecondsToTime(duration)}`)
+                        .setStyle(ButtonStyle.Secondary)
+                        .setEmoji('⏱️')
+                        .setDisabled(true)
+                )
 
-            punishmentType: `${duration === null ? `unmute` : `mute`}`,
-            punishmentID: punishmentID,
-            punishmentReason: reason,
-            punishmentDate: Date.now(),
-            punishmentDuration: `${duration === null ? `N/A` : duration}`,
-            punishmentActive: true
-        });
-
-        const buttonRow = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId(`e`)
-                    .setLabel(`Muted by ${interaction.user.displayName}`)
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(true)
-                    .setEmoji(`🔇`),
-                new ButtonBuilder()
-                    .setCustomId(`mute:${punishmentID}:revoke`)
-                    .setLabel(`Revoke`)
-                    .setStyle(ButtonStyle.Danger)
-                    .setEmoji(`🔇`)
+            await sendEmbed(
+                interaction, EmbedType.ERROR,
+                `Muted ${actionData.target.username}`,
+                `<@${actionData.target.id}> has been muted by <@${actionData.moderator}> for ${actionData.reason}.`,
+                false, [buttonRow]
             );
-
-        await checkUser(interaction.guild.id, user.id);
-        const userDocument = await userModel.findOne({guildID: interaction.guild.id, userID: user.id});
-        if (userDocument) {
-            userDocument.mutes.push(punishment);
-            userDocument.save();
-        } else {
-            const newUser = new userModel({
-                guildID: interaction.guild.id,
-                userID: user.id,
-                mutes: [punishment]
-            });
-            await newUser.save();
         }
 
-        await punishment.save();
-        await user.timeout(parseInt(duration), reason);
-        await sendEmbed(interaction, EmbedType.SUCCESS,
-            `${duration === '0' ? `Unmuted` : `Muted`} ${user.user.displayName}`, `\`ID: ${punishmentID}\` | **${duration === '0' ? `Unmuted` : `Muted`} for:** ${reason}`, false, [buttonRow]);
-
-
+        try {
+            await actionData.memberTarget.timeout(duration, actionData.reason)
+                .then(async () => { await sendLog(); })
+                .catch(async (error) => { await interaction.reply({content: 'There was an error muting this user', ephemeral: false}); });
+        } catch (error) {
+            await interaction.reply({content: 'There was an error muting this user', ephemeral: false});
+        }
     }
-
 }

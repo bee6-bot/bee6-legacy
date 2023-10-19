@@ -1,71 +1,47 @@
 const {SlashCommandBuilder, PermissionsBitField, ButtonBuilder, ActionRowBuilder, ButtonStyle} = require('discord.js');
 const {sendEmbed, EmbedType} = require('../../functions/utilities/embedUtils');
-const userModel = require('../../models/userModel');
-const moderationModel = require('../../models/moderationModel');
 
 module.exports = {
-
     data: new SlashCommandBuilder()
-        .setName(`kick`)
-        .setDescription(`Kick a user.`)
+        .setName('kick')
+        .setDescription('Kicks a user')
         .setDefaultMemberPermissions(PermissionsBitField.KickMembers)
-        .addUserOption(option => option
-            .setName(`user`)
-            .setDescription(`The user to kick.`)
-            .setRequired(true)
-        )
-        .addStringOption(option => option
-            .setName(`reason`)
-            .setDescription(`The reason for the kick.`)
-            .setRequired(true)
-        ),
+        .addUserOption(option => option.setName('user').setDescription('The user to ban').setRequired(true))
+        .addStringOption(option => option.setName('reason').setDescription('The reason for the ban').setRequired(true)),
+    category: 'Moderation',
+    description: 'Kicks a user',
 
-    async execute(interaction) {
+    async execute(interaction) {const actionData = {
+            moderator: interaction.user.id,
+            target: interaction.options.getUser('user'),
+            reason: interaction.options.getString('reason') || 'No reason provided'
+        };
 
-        const user = interaction.options.getUser(`user`);
-        const reason = interaction.options.getString(`reason`);
+        async function sendLog() {
+            const buttonRow = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('moderator')
+                        .setLabel(`Kicked by ${interaction.user.username}`)
+                        .setStyle(ButtonStyle.Secondary)
+                        .setEmoji('👮')
+                        .setDisabled(true)
+                )
 
-        const punishmentID = Math.random().toString(36).substring(2, 9);
-        const punishment = new moderationModel({
-            guildID: interaction.guild.id,
-            userID: user.id,
-            moderatorID: interaction.user.id,
-
-            punishmentType: `kick`,
-            punishmentID: punishmentID,
-            punishmentReason: reason,
-            punishmentDate: Date.now(),
-            punishmentDuration: `N/A`,
-            punishmentActive: true
-        });
-
-        const buttonRow = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId(`e`)
-                    .setLabel(`Kicked by ${interaction.user.displayName}`)
-                    .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(true)
-                    .setEmoji(`👢`)
+            await sendEmbed(
+                interaction, EmbedType.ERROR,
+                `Kicked ${actionData.target.username}`,
+                `<@${actionData.target.id}> has been kicked by <@${actionData.moderator}> for ${actionData.reason}`,
+                false, [buttonRow]
             );
-
-        const userDocument = await userModel.findOne({guildID: interaction.guild.id, userID: user.id});
-        if (userDocument) {
-            userDocument.kicks.push(punishment);
-            userDocument.save();
-        } else {
-            const newUser = new userModel({
-                guildID: interaction.guild.id,
-                userID: user.id,
-                kicks: [punishment]
-            });
-            await newUser.save();
         }
 
-        await punishment.save();
-        await user.kick(reason);
-        await sendEmbed(interaction, EmbedType.Information, `User kicked`, `${user} has been kicked by ${interaction.user} for \`${reason}\`.`, buttonRow);
-
+        try {
+            await interaction.guild.members.ban(actionData.target, {reason: actionData.reason})
+                .then(async () => { await sendLog(); })
+                .catch(async (error) => { await interaction.reply({content: 'There was an error kicking this user', ephemeral: false}); });
+        } catch (error) {
+            await interaction.reply({content: 'There was an error kicking this user', ephemeral: false});
+        }
     }
-
 }

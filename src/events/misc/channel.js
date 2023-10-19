@@ -1,6 +1,6 @@
 const guildModel = require("../../models/guildModel");
 const {EmbedBuilder} = require("discord.js");
-const {shouldLogEvent} = require("../../functions/utilities/modlogUtils");
+const {shouldLogEvent} = require("../../functions/utilities/moderation/modlogUtils");
 
 
 /**

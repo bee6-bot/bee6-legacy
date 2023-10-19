@@ -42,17 +42,23 @@ const EmbedType = {
  * @param {boolean} [ephemeral=true] - Whether the embed should be ephemeral (only visible to the user who triggered the interaction).
  * @param {Array} [components=[]] - The components to add to the embed.
  * @param {boolean} [edit=false] - Whether to edit the original reply instead of sending a new one.
+ * @param {string} [channelId=null] - The ID of the channel to send the embed to. If not provided, the embed will be sent to the channel where the interaction was triggered.
  * @returns {Promise<void>}
  * @throws {Error} If an error occurs while sending the embed.
  */
 
 const {EmbedBuilder} = require("discord.js");
 
-async function embedUtils(interaction, type, title, description, ephemeral = true, components = [], edit = false) {
+async function embedUtils(interaction, type, title, description, ephemeral = true, components = [], edit = false, channelId = null) {
+
 
     // Get user configs
     const user = await userModel.findOne({userID: interaction.user.id, guildID: interaction.guild.id});
     let compact = user.preferences.compactMode || false;
+
+    // Get channel
+    let channel;
+    if (channelId) channel = await interaction.guild.channels.cache.get(channelId);
 
     try {
         let colour, emoji;
@@ -76,7 +82,7 @@ async function embedUtils(interaction, type, title, description, ephemeral = tru
                 emoji = 'ℹ️';
         }
 
-        if (!compact) {
+        if (!compact || channel) {
             const embed = new EmbedBuilder()
                 .setTitle(title)
                 .setDescription(description)
@@ -88,18 +94,27 @@ async function embedUtils(interaction, type, title, description, ephemeral = tru
 
             // Reply to the interaction with the embed
             try {
-                if (edit) await interaction.editReply({embeds: [embed], ephemeral: ephemeral, components: components});
-                else if (interaction.replied || interaction.deferred) await interaction.followUp({embeds: [embed], ephemeral: ephemeral, components: components});
-                else await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
+
+                if (channel) await channel.send({embeds: [embed], ephemeral: ephemeral, components: components});
+                else {
+                    if (edit) await interaction.editReply({
+                        embeds: [embed],
+                        ephemeral: ephemeral,
+                        components: components
+                    });
+                    else if (interaction.replied || interaction.deferred) await interaction.followUp({
+                        embeds: [embed],
+                        ephemeral: ephemeral,
+                        components: components
+                    });
+                    else await interaction.reply({embeds: [embed], ephemeral: ephemeral, components: components});
+                }
             } catch (err) {
                 if (err.code === 10062) await interaction.editReply({embeds: [embed]});
                 if (err.code === "InteractionAlreadyReplied") await interaction.editReply({embeds: [embed]});
                 else return logMessage(`Error sending embed: ${err.stack}`, 'ERROR');
-
             }
-        }
-
-        else {
+        } else {
             await interaction.reply({
                 content: `**${emoji} ${title}**\n${description}`,
                 ephemeral: ephemeral,
