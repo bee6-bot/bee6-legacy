@@ -8,7 +8,10 @@
 *** Thanks again! Now go create something AMAZING! :D
 -->
 
+# This repository will no longer be updated!
+> BEE6's development is now happening [here](https://github.com/bee6-bot/bee6).
 
+----
 
 <!-- PROJECT SHIELDS -->
 <!--
